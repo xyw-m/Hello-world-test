@@ -1,9 +1,12 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
 import Home from '../views/Home.vue'
+import Test from '../views/Test.vue'
 
+// 如果在一个模块化工程中使用它，必须要通过 Vue.use() 明确地安装路由功能：
 Vue.use(VueRouter)
 
+// 定义路由，每个路由应该对应一个组件
 const routes: Array<RouteConfig> = [
   {
     path: '/',
@@ -17,12 +20,19 @@ const routes: Array<RouteConfig> = [
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
+  },
+  {
+    path: '/test',
+    name: 'Test',
+    component: Test
   }
 ]
 
+// 创建 router 实例，然后传 `routes` 配置
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
+  // (缩写) 相当于 routes: routes
   routes
 })
 
