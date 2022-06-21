@@ -31,7 +31,7 @@ export default class playground extends Vue {
   //   { content: '用来表示被截断的文本。字符串内容将被添加在内容区域中，所以会减少显示出的文本。如果空间太小到连省略号都容纳不下，那么这个字符串也会被截断。'}
   // ]
   data = [
-    { title: undefined, suffix: true},
+    { title: undefined, suffix: true, img: {src: ''}},
     { title: '1', content: null },
     { title: null, content: undefined, img: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'},
     { title: undefined, content: "", img:undefined, suffix: true},

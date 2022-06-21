@@ -11,6 +11,7 @@
                 <el-menu-item index="/test">test.md</el-menu-item>
                 <el-menu-item index="/playground">playground</el-menu-item>
                 <el-menu-item index="/collapse">collapse</el-menu-item>
+                <el-menu-item index="/xywui">xywui-test</el-menu-item>
             </el-submenu>
         </el-menu>
     </div>

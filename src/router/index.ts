@@ -30,6 +30,11 @@ const routes: Array<RouteConfig> = [
     path: '/collapse',
     name: 'collapse',
     component: () => import('../views/collapse.vue')
+  },
+  {
+    path: '/xywui',
+    name: 'xywui',
+    component: () => import('../views/xywuiTest.vue')
   }
 ]
 

@@ -4,9 +4,9 @@
     <!-- <a-affix :offset-top="20">
       <el-button>测试</el-button>
     </a-affix> -->
-    <affix :offsetTop="20">
+    <x-affix :offsetTop="20">
       <el-button>测试affix</el-button>
-    </affix>
+    </x-affix>
     <pre>
       Element UI 贡献指南
       Hi! 首先感谢你使用 Element UI。

@@ -30,30 +30,30 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 
-// interface listItem {
-//   content?: string
-//   title?: string
-//   img?: imgConfig | string
-// }
+interface listItem {
+  content?: string
+  title?: string
+  img?: imgConfig | string
+}
 
-// interface imgConfig {
-//   src: string,
-//   class?: string,
-//   fit?: string,
-//   lazy?: boolean
-// }
+interface imgConfig {
+  src: string,
+  class?: string,
+  fit?: string,
+  lazy?: boolean
+}
 
 @Component({
   name: 'list'
 })
 export default class list extends Vue {
-  @Prop({default:() => []}) private data !: Array<unknown> 
+  @Prop({default:() => []}) private data !: Array<listItem | unknown>
   @Prop({ default: 'common'}) private listStyle !: string // 列表样式，可选值：noBorder | commom | zebra | card
 
   get dataSource(){
-    // if(this.data.includes(null) || this.data.includes(undefined)){
-    //   console.log('Null or Undefined Value found in the data, Please check data prop')
-    // }
+    if(this.data.includes(null) || this.data.includes(undefined)){
+      console.log('Null or Undefined Value found in the data, Please check data prop')
+    }
     return this.data
   }
 
