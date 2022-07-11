@@ -35,6 +35,11 @@ const routes: Array<RouteConfig> = [
     path: '/xywui',
     name: 'xywui',
     component: () => import('../views/xywuiTest.vue')
+  },
+  {
+    path: '/zoom',
+    name: 'zoom',
+    component: () => import('../views/zoom.vue')
   }
 ]
 

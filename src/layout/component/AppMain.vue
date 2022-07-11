@@ -53,6 +53,9 @@
         <!-- <markdown-it-vue :content="content"/> -->
         <!-- <test class="markdown-body"></test> -->
         <router-view></router-view>
+        <div class="child-app-container">
+            <div id="child-container"></div>
+        </div>
         <!-- <about></about> -->
         <!-- <update-hooks></update-hooks> -->
     </div>
