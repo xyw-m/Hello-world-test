@@ -1,6 +1,6 @@
 <template>
   <div class="collapse">
-    <sinotruk-collapse :dataList="dataList" accordion>
+    <sinotruk-collapse :dataList="dataList">
       <template #title="slotProps">
         {{ slotProps.item.title }}<i v-if="slotProps.item.title" class="header-icon el-icon-info"></i>
       </template>
@@ -19,7 +19,7 @@ import SinotrukCollapse from '@/components/sinotruk-collapse.vue'
 })
 export default class collaps extends Vue {
   dataList = [
-    { name: 1, content: '内容内容内容', title: '禁用', disabled: null },
+    { name: 1, content: '内容内容内容', title: '禁用', disabled: true },
     { name: 2, content: '文本文本文本', title: '标题' },
     { name: 3, content: '用来表示被截断的文本。字符串内容将被添加在内容区域中，所以会减少显示出的文本。如果空间太小到连省略号都容纳不下，那么这个字符串也会被截断。', title: '标题' },
     { name: 4, title: null, content: null, disabled: null, a:1}

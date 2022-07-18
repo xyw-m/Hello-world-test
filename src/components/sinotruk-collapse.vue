@@ -8,9 +8,9 @@
         :disabled="item.disabled ? item.disabled : false"
         class="collapse-item">
         <template #title>
-          <div class="title"><slot name="title" :item="item">
-            {{ item.title }}
-          </slot></div>
+          <div class="title">
+            <slot name="title" :item="item">{{ item.title }}</slot>
+          </div>
         </template>
         <slot name="content" :item="item">
           <div class="collapse-item_content">{{ item.content }}</div>
@@ -20,7 +20,7 @@
   </div>
 </template>
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 
 @Component({
   name: 'SinotrukCollapse'
@@ -35,25 +35,24 @@ export default class SinotrukCollapse extends Vue {
   handleChange(activeNames:any):void{
     this.$emit('change', activeNames)
   }
-
-  isPropertyExist(obj:any, property:string):boolean{
-    if(!obj){
-      return false
-    }
-    if(typeof obj !== 'object' || !Object.prototype.hasOwnProperty.call(obj,property)){
-      return false
-    } else {
-      return true
-    }
-  }
 }
 </script>
 <style lang="scss">
 .sinotruk-collapse .el-collapse-item__header {
+  border: none;
   &:hover {
-    color: 	#0066FF;
+    color: 	#0A7CFF;
+  }
+  padding: 0 6px 0 16px;
+  &:hover {
+    background-color: #F8F8F8;
   }
 }
+
+.sinotruk-collapse .el-collapse {
+  border: none;
+}
+
 .sinotruk-collapse .el-collapse-item__header.is-active {
   color: 	#0066FF;
 }
@@ -65,7 +64,27 @@ export default class SinotrukCollapse extends Vue {
 .sinotruk-collapse .el-collapse-item__header.is-active .el-collapse-item__arrow.is-active {
   transform: rotate(270deg);
 }
+
+.sinotruk-collapse .el-collapse-item__header.is-active {
+  &:hover {
+    background-color: #FFFFFF;
+  }
+}
 .collapse-item_content {
   text-align: left;
+}
+.sinotruk-collapse .collapse-item {
+  border: 1px solid #DDDDDD;
+  border-bottom: none;
+  &:last-child {
+    border-bottom: 1px solid #DDDDDD;
+  }
+  &:hover {
+    background-color: #F8F8F8;
+  }
+  .title {
+    font-family: MicrosoftYaHei-Bold, MicrosoftYaHei;
+    font-weight: bold;
+  }
 }
 </style>

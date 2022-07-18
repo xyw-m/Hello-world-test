@@ -40,6 +40,16 @@ const routes: Array<RouteConfig> = [
     path: '/zoom',
     name: 'zoom',
     component: () => import('../views/zoom.vue')
+  },
+  {
+    path: '/test',
+    name: 'test',
+    component: () => import('../views/test.vue')
+  },
+  {
+    path: '/list',
+    name: 'list',
+    component: () => import('../views/list.vue')
   }
 ]
 

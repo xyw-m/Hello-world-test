@@ -73,16 +73,19 @@ export default class list extends Vue {
 <style lang="scss" scoped>
 .list-container {
   width: 100%;
+  background-color: #FFFFFF;
+  box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1000);
+  border-radius: 4px;
+  padding: 5px 0;
   .list-items {
     margin: 0;
     padding-inline-start: 0;
-    padding: 0 10px;
+    padding-left: 32px;
     .list-item {
       display: flex;
       text-align: left;
       justify-content: space-around;
       align-items: center;
-      padding: 0 10px;
       .item-img {
         width: 100px;
         min-width: 100px;
@@ -133,20 +136,20 @@ export default class list extends Vue {
     margin-right: 15px;
   }
 
-  .item-content{
+  .list-item {
     position: relative;
 
     &::before {
       content: '';
       position: absolute;
-      border-radius: 4px;
+      border-radius: 50%;
       background-color: #000000;
       width: 4px;
       height: 4px;
       display: inline-block;
       border: 1px sold #000000;
       top: 1rem;
-      left: -0.5rem;
+      left: -0.8rem;
     }
   }
 }
