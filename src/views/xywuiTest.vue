@@ -53,7 +53,7 @@
 </template>
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import myMixin from '@/mixins/test'
+import myMixin from '@/mixins/test.js'
 @Component({
   name: 'xywuiTest',
   components: {},

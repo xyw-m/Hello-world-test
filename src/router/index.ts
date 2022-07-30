@@ -50,6 +50,16 @@ const routes: Array<RouteConfig> = [
     path: '/list',
     name: 'list',
     component: () => import('../views/list.vue')
+  },
+  {
+    path: '/datepicker',
+    name: 'datepicker',
+    component: () => import('../views/datepicker.vue')
+  },
+  {
+    path: '/fileUpload',
+    name: 'fileUpload',
+    component: () => import('../views/fileUpload.vue')
   }
 ]
 

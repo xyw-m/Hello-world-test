@@ -7,7 +7,7 @@ export function getTargetRect(target:any){
 }
 
 // 获取固定Top
-export function getFixedTop(placeholderRect, targetRect, offsetTop){
+export function getFixedTop(placeholderRect:any, targetRect:any, offsetTop:any){
   if(offsetTop !== undefined && targetRect.top > placeholderRect.top - offsetTop){
     return offsetTop + targetRect.top + 'px'
   }
@@ -15,7 +15,7 @@ export function getFixedTop(placeholderRect, targetRect, offsetTop){
 }
 
 // 获取固定bottom
-export function getFixedBottom(placeholderRect, targetRect, offsetBottom){
+export function getFixedBottom(placeholderRect:any, targetRect:any, offsetBottom:any){
   if(offsetBottom !== undefined && targetRect.bottom < placeholderRect.bottom + offsetBottom){
     const targetBottomOffset = window.innerHeight - targetRect.bottom
     return offsetBottom + targetBottomOffset + 'px'
@@ -30,18 +30,18 @@ const TRIGGER_EVENTS = [
   'pageshow',
   'load'
 ]
-let observerEntities = []
+let observerEntities:any = []
 
 function eventHandler(entity:any){
-  entity.affixList.forEach(targetAffix => {
+  entity.affixList.forEach((targetAffix:any) => {
     targetAffix.lazyUpdatePosition()
   })
 }
 
-export function addObserveTarget(target, affix){
+export function addObserveTarget(target:any, affix:any){
   if(!target) return;
 
-  let entity = observerEntities.find(item => item.target === target)
+  let entity = observerEntities.find((item:any) => item.target === target)
   if(entity){
     entity.affixList.push(affix)
   } else {
@@ -55,7 +55,7 @@ export function addObserveTarget(target, affix){
     TRIGGER_EVENTS.forEach(eventName => {
       // entity.target.addEventListener(eventName, eventHandler(entity))
       entity.target.addEventListener(eventName, () => {
-        entity.affixList.forEach(targetAffix => {
+        entity.affixList.forEach((targetAffix:any) => {
           targetAffix.lazyUpdatePosition()
         })
       })
@@ -63,17 +63,17 @@ export function addObserveTarget(target, affix){
   }
 }
 
-export function removeObserveTarget(affix){
-  const observerEntity = observerEntities.find(oriObserverEntity => {
-    const hasAffix = oriObserverEntity.affixList.some(item => item === affix)
+export function removeObserveTarget(affix:any){
+  const observerEntity = observerEntities.find((oriObserverEntity:any) => {
+    const hasAffix = oriObserverEntity.affixList.some((item:any) => item === affix)
     if(hasAffix){
-      oriObserverEntity.affixList = oriObserverEntity.affixList.filter(item => item != affix)
+      oriObserverEntity.affixList = oriObserverEntity.affixList.filter((item:any) => item != affix)
     }
     return hasAffix
   })
 
   if(observerEntity && observerEntity.affixList.length === 0){
-    observerEntities = observerEntities.filter(item => item !== observerEntity)
+    observerEntities = observerEntities.filter((item:any) => item !== observerEntity)
 
     // remove listener
     TRIGGER_EVENTS.forEach(eventName => {

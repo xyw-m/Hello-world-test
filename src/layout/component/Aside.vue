@@ -15,6 +15,8 @@
                 <el-menu-item index="/store-app">child-web</el-menu-item>
                 <el-menu-item index="/zoom">zoom</el-menu-item>
                 <el-menu-item index="/list">list</el-menu-item>
+                <el-menu-item index="/datepicker">datepicker</el-menu-item>
+                <el-menu-item index="/fileUpload">文件上传</el-menu-item>
             </el-submenu>
         </el-menu>
     </div>
