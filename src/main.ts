@@ -12,6 +12,7 @@ import 'ant-design-vue/dist/antd.css'
 import xywui from 'xyw-ui'
 import { registerMicroApps, start } from 'qiankun'
 import './directives/index'
+import actions from './action.js'
 
 // 消息提示的环境配置，设置为FALSE时不会显示开发模式中的一些警告信息
 Vue.config.productionTip = false
@@ -25,7 +26,8 @@ registerMicroApps([
     name: 'store-app',
     entry: '//localhost:1010',
     container: '#child-container',
-    activeRule: '/store-app'
+    activeRule: '/store-app',
+    props: { actions, msg: 'w'} // 向子应用传递创建的全局状态
   }
 ])
 

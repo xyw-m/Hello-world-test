@@ -8,6 +8,8 @@
                     <i class="el-icon-menu"></i>
                     <span>11111111</span>
                 </template>
+                <el-menu-item index="/communication">父子应用通信</el-menu-item>
+                <el-menu-item index="/about">affix.md</el-menu-item>
                 <el-menu-item index="/test">test.md</el-menu-item>
                 <el-menu-item index="/playground">playground</el-menu-item>
                 <el-menu-item index="/collapse">collapse</el-menu-item>

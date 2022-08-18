@@ -5,21 +5,25 @@
       v-model="value"
       placeholder="任意时间点"
       ref="el-time-picker"></el-time-picker>
+      <el-divider></el-divider>
     <div class="self-picker">
-      自定义组件
-      <picker type="week"></picker>
+      <h4>time picker</h4>
+      <time-picker
+        v-model="diyValue"></time-picker>
     </div>
   </div>
 </template>
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
-import picker from '@/components/dateTimePicker/picker.vue'
+import timePicker from '@/components/dateTimePicker/picker/time-picker.js'
 @Component({
   name: 'datePicker',
-  components: {picker}
+  components: { timePicker }
 })
 export default class datePicker extends Vue {
   value = ''
+  diyValue = ''
+  
   mounted(){
     console.log(this.$refs)
   }

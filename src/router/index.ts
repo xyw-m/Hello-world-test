@@ -60,6 +60,11 @@ const routes: Array<RouteConfig> = [
     path: '/fileUpload',
     name: 'fileUpload',
     component: () => import('../views/fileUpload.vue')
+  },
+  {
+    path: '/communication',
+    name: 'communication',
+    component: () => import('../views/communication.vue')
   }
 ]
 
