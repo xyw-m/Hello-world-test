@@ -9,7 +9,8 @@
     <div class="self-picker">
       <h4>time picker</h4>
       <time-picker
-        v-model="diyValue"></time-picker>
+        v-model="diyValue"
+        @change="timeChange"></time-picker>
     </div>
   </div>
 </template>
@@ -23,6 +24,10 @@ import timePicker from '@/components/dateTimePicker/picker/time-picker.js'
 export default class datePicker extends Vue {
   value = ''
   diyValue = ''
+
+  timeChange(){
+    console.log(this.diyValue, 'diyValue')
+  }
   
   mounted(){
     console.log(this.$refs)

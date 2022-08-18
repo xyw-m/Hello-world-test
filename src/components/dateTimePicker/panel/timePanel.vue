@@ -18,7 +18,7 @@
         @select-range="setSelectionRange"></time-spinner>
       <div class="panel-footer">
         <el-button size="mini" @click="handleCancel">取消</el-button>
-        <el-button size="mini" type="primary">确认</el-button>
+        <el-button size="mini" type="primary" @click="handleConfirm()">确认</el-button>
       </div>
     </div>
   </transition>
@@ -95,6 +95,11 @@ export default {
     handleCancel(){
       this.$emit('pick', this.oldValue, false)
       console.log(this.oldValue, 'oldValue')
+    },
+    handleConfirm(visible = false, first){
+      if(first) return
+      const date = clearMilliseconds(limitTimeRange(this.date, this.selectableRange, this.format))
+      this.$emit('pick', date, visible, first)
     },
     setSelectionRange(start, end){
       this.$emit('select-range', start, end)

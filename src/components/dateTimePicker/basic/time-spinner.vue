@@ -4,7 +4,7 @@
     <el-scrollbar
       tag="ul"
       ref="hours"
-      class="timeSpinner-wrapper"
+      class="timeSpinner-wrapper wrapper-hours"
       wrap-style="max-height: inherit;"
       view-class="timeSpinner-ul"
       @mousemove.native="adjustCurrentSpinner('hours')">
@@ -19,9 +19,9 @@
     <el-scrollbar
       tag="ul"
       ref="minutes"
-      class="timeSpinner-wrapper"
+      class="timeSpinner-wrapper wrapper-minutes"
       wrap-style="max-height: inherit;"
-      view-class="timeSpinner-ul"
+      view-class="timeSpinner-ul timeSpinner-minutes"
       @mousemove.native="adjustCurrentSpinner('minutes')">
       <li
         v-for="(enabled, key) in minutesList"
@@ -172,6 +172,19 @@ export default {
       z-index: -1;
       left: 9px;
       top: 43%;
+    }
+  }
+
+  .wrapper-hours, .wrapper-minutes {
+    &::after {
+      content: ':';
+      color: #0A7CFF;
+      position: absolute;
+      z-index: -1;
+      top: 46%;
+      left: 55px;
+      font-weight: bold;
+      font-size: 10px;
     }
   }
 
