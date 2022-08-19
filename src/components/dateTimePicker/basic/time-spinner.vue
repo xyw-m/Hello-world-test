@@ -12,7 +12,8 @@
         v-for="(disabled, hour) in hoursList"
         :key="hour"
         class="timeSpinner-item"
-        :class="{'active': hour === hours}">{{ ('0' + hour).slice(-2) }}
+        :class="{'active': hour === hours}"
+        @click="handleClick('hours', { value: hour, disabled: disabled})">{{ ('0' + hour).slice(-2) }}
       </li>
     </el-scrollbar>
     <!-- minutes -->
@@ -27,7 +28,8 @@
         v-for="(enabled, key) in minutesList"
         :key="key"
         class="timeSpinner-item"
-        :class="{ 'active': key === minutes }">{{ ('0' + key).slice(-2) }}</li>
+        :class="{ 'active': key === minutes }"
+        @click="handleClick('minutes', { value: key, disabled: false })">{{ ('0' + key).slice(-2) }}</li>
     </el-scrollbar>
     <!-- seconds -->
     <el-scrollbar
@@ -42,7 +44,8 @@
         v-for="(second, key) in 60"
         :key="key"
         class="timeSpinner-item"
-        :class="{ 'active': key === seconds }">{{ ('0' + key).slice(-2) }}</li>
+        :class="{ 'active': key === seconds }"
+        @click="handleClick('seconds', { value: key, disabled: false })">{{ ('0' + key).slice(-2) }}</li>
     </el-scrollbar>
   </div>
 </template>
@@ -118,6 +121,13 @@ export default {
       const value = Math.min(Math.round((this.$refs[type].wrap.scrollTop - (this.scrollBarHeight(type) * 0.5 - 10) / this.typeItemHeight(type) + 3) / this.typeItemHeight(type)), (type === 'hours' ? 23 : 59));
       this.modifyDateField(type, value)
     },   
+    handleClick(type, { value, disabled }){
+      if(!disabled){
+        this.modifyDateField(type, value)
+        this.emitSelectRange(type)
+        this.adjustSpinner(type, value)
+      }
+    },
     modifyDateField(type, value){
       switch(type){
         case 'hours':

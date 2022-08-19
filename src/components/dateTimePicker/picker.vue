@@ -6,7 +6,8 @@
     :value="displayValue"
     v-clickoutside="handleClose"
     @input="value => userInput = value"
-    @focus="handleFocus">
+    @focus="handleFocus"
+    @change="handleChange">
     <i 
       slot="prefix"
       class="el-input__icon"
@@ -389,6 +390,16 @@ export default {
         this.valueOnOpen = val
       }
     },
+    isValidValue(value){
+      if(!this.picker){
+        this.mountPicker()
+      }
+      if(this.picker.isValidValue){
+        return value && this.picker.isValidValue(value)
+      } else {
+        return true
+      }
+    },
     formatToValue(date){
       const isFormattable = isDateObject(date) || (Array.isArray(date) && date.every(isDateObject))
       if(this.valueFormat && isFormattable){
@@ -397,6 +408,11 @@ export default {
       } else {
         return date
       }
+    },
+    // deals with user input
+    parseString(value){
+      const type = Array.isArray(value) ? this.type : this.type.replace('range', '')
+      return parseAsFormatAndType(value, this.format, type)
     },
     handleFieldReset(initialValue){
       this.userInput = initialValue === '' ? null : initialValue
@@ -412,6 +428,24 @@ export default {
         // restore to former value
         const oldValue = parseAsFormatAndType(this.valueOnOpen, this.valueFormat, this.type, this.rangeSeparator) || this.valueOnOpen
         this.emitInput(oldValue)
+      }
+    },
+    handleChange(){
+      if(this.userInput){
+        const value = this.parseString(this.displayValue)
+        if(value){
+          this.picker.value = value
+          if(this.isValidValue(value)){
+            this.emitInput(value)
+            this.userInput = null
+          }
+        }
+      }
+
+      if(this.userInput === ''){
+        this.emitInput(null)
+        this.emitChange(null)
+        this.userInput = null
       }
     }
   },
