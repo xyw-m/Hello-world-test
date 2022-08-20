@@ -1,5 +1,6 @@
 import Picker from '../picker.vue'
 import TimePanel from '../panel/timePanel.vue'
+import TimeRangePanel from '../panel/timeRangePanel'
 
 export default {
   mixins: [Picker],
@@ -24,6 +25,6 @@ export default {
 
   created(){
     this.type = this.isRange ? 'timerange' : 'time'
-    this.panel = this.isRange ? '' : TimePanel
+    this.panel = this.isRange ? TimeRangePanel : TimePanel
   }
 }

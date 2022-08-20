@@ -12,7 +12,7 @@
         v-for="(disabled, hour) in hoursList"
         :key="hour"
         class="timeSpinner-item"
-        :class="{'active': hour === hours}"
+        :class="{'active': hour === hours, 'disabled': disabled}"
         @click="handleClick('hours', { value: hour, disabled: disabled})">{{ ('0' + hour).slice(-2) }}
       </li>
     </el-scrollbar>
@@ -29,7 +29,7 @@
         :key="key"
         class="timeSpinner-item"
         :class="{ 'active': key === minutes }"
-        @click="handleClick('minutes', { value: key, disabled: false })">{{ ('0' + key).slice(-2) }}</li>
+        @click="handleClick('minutes', { value: key, disabled: !enabled })">{{ ('0' + key).slice(-2) }}</li>
     </el-scrollbar>
     <!-- seconds -->
     <el-scrollbar
@@ -228,6 +228,11 @@ export default {
     color: #0A7CFF;
     // background-color: #E6F1FF;
     font-weight: bold;
+  }
+
+  .disabled {
+    color: #999999;
+    cursor: not-allowed;
   }
 }
 </style>

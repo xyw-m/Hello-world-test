@@ -74,7 +74,6 @@ export default {
     showSeconds(){
       return (this.format || '').indexOf('ss') !== -1
     },
-
   },
 
   methods: {
@@ -94,7 +93,6 @@ export default {
     },
     handleCancel(){
       this.$emit('pick', this.oldValue, false)
-      console.log(this.oldValue, 'oldValue')
     },
     handleConfirm(visible = false, first){
       if(first) return
@@ -105,7 +103,7 @@ export default {
       this.$emit('select-range', start, end)
       this.selectionRange = [start, end]
     }
-  }
+  },
 }
 </script>
 <style lang="scss" scoped>
@@ -117,6 +115,8 @@ export default {
   border: 1px solid #E1E1E1;
   padding: 17px 20px;
   margin-top: 4px;
+  z-index: 20001;
+  position: absolute;
 
   .header-wrapper {
     width: 216px;

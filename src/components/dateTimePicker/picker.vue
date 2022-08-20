@@ -5,6 +5,7 @@
     placeholder="请选择时间"
     :value="displayValue"
     v-clickoutside="handleClose"
+    v-if="!ranged"
     @input="value => userInput = value"
     @focus="handleFocus"
     @change="handleChange">
@@ -14,6 +15,36 @@
       :class="triggerClass"
       ></i>
   </el-input>
+  <div
+    v-else
+    ref="reference"
+    class="date-range-editor"
+    v-clickoutside="handleClose">
+    <span class="range-icon">
+      <i :class="['el-input__icon', triggerClass]"></i>
+    </span>
+    <!-- 开始时间 -->
+    <input
+      auto-complete="off"
+      placeholder="开始时间"
+      :value="displayValue && displayValue[0]"
+      class="range-input"
+      @focus="handleFocus"
+      @input="handleStartInput"
+      @change="handleStartChange">
+    <slot name="range-separator">
+      <span class="range-separator">{{ rangeSeparator }}</span>
+    </slot>
+    <!-- 结束时间 -->
+    <input
+      auto-complete="off"
+      placeholder="结束时间"
+      :value="displayValue && displayValue[1]"
+      class="range-input"
+      @focus="handleFocus"
+      @input="handleEndInput"
+      @change="handleEndChange">
+  </div>
 </template>
 <script>
 import Vue from 'vue'
@@ -204,7 +235,7 @@ export default {
     defaultTime: {},  // 是否有必要？
     pickerOptions: {},
     rangeSeparator: {
-      default: '-'
+      default: '至'
     },
     valueFormat: String
   },
@@ -261,6 +292,9 @@ export default {
     },
     triggerClass(){
       return this.type.indexOf('time') !== -1 ? 'el-icon-time' : 'el-icon-date'
+    },
+    ranged(){
+      return this.type.indexOf('range') > -1
     }
   },
 
@@ -305,9 +339,10 @@ export default {
 
       this.pickerVisible = this.picker.visible = true
 
-      this.updatePopper()
+      // this.updatePopper()
 
       this.picker.value = this.parsedValue 
+      console.log(this.parsedValue, 'parsedValue')
 
       this.$nextTick(() => {
         this.picker.adjustSpinners && this.picker.adjustSpinners()
@@ -315,6 +350,7 @@ export default {
     },
     mountPicker(){
       this.picker = new Vue(this.panel).$mount()
+      console.log(this.picker, 'picker in mountPicker')
       this.picker.defaultValue = this.defaultValue
       // 可以这样设置DOM元素width吗？
       this.popperElm = this.picker.$el; // 弹出层设置
@@ -409,6 +445,10 @@ export default {
         return date
       }
     },
+    formatToString(value){
+      const type = Array.isArray(value) ? this.type : this.type.replace('range', '')
+      return formatAsFormatAndType(value, this.format, type)
+    },
     // deals with user input
     parseString(value){
       const type = Array.isArray(value) ? this.type : this.type.replace('range', '')
@@ -447,6 +487,45 @@ export default {
         this.emitChange(null)
         this.userInput = null
       }
+    },
+    handleStartInput(event){
+      if(this.userInput){
+        this.userInput = [event.target.value, this.userInput[1]]
+      } else {
+        this.userInput = [event.target.value, null]
+      }
+    },
+    handleStartChange(event){
+      const value = this.parseString(this.userInput && this.userInput[0])
+      if(value){
+        this.userInput = [this.formatToString(value), this.displayValue[1]]
+        const newValue = [value, this.picker.value && this.picker.value[1]]
+        this.picker.value = newValue
+        if(this.isValidValue(newValue)){
+          this.emitInput(newValue)
+          this.userInput = null
+        }
+      }
+    },
+    handleEndInput(event){
+      if(this.userInput){
+        this.userInput = [this.userInput[0], event.target.value]
+      } else {
+        this.userInput = [null, event.target.value]
+      }
+    },
+    handleEndChange(event){
+      const value = this.parseString(this.userInput && this.userInput[1])
+      if(value){
+        this.userInput = [this.displayValue[0], this.formatToString(value)]
+        const newValue = [this.picker.value && this.picker.value[0], value]
+        this.picker.value = newValue
+
+        if(this.isValidValue(newValue)){
+          this.emitInput(newValue)
+          this.userInput = null
+        }
+      }
     }
   },
 
@@ -467,7 +546,29 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.date-editor {
+.date-editor, .date-range-editor {
   width: 256px;
+  border-radius: 3px;
+}
+
+.date-range-editor {
+  border: 1px solid #DDDDDD;
+  text-align: left;
+
+  .range-icon {
+    color: #C0C4CC;
+    font-size: 14px;
+  }
+
+  .range-input {
+    display: inline-block;
+    width: 80px;
+    font-size: 12px;
+    border: none;
+    margin-left: 10px;
+    &:focus-visible {
+      outline: none;
+    }
+  }
 }
 </style>
