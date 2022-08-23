@@ -147,6 +147,9 @@ export default {
       this.$emit('pick', [this.minDate, this.maxDate], visible)
 
     },
+    handleClear(){
+      this.$emit('pick', null)
+    },
     setMinSelectionRange(start, end){
       this.$emit('select-range', start, end, 'min')
       this.selectionRange = [start, end]

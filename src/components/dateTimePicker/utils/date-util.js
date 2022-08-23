@@ -41,6 +41,89 @@ export function parseDate(string, format){
   return fecha.parse(string, format || 'yyyy-MM-dd')
 }
 
+export function getRangeYears(oldRanges, date,  ranges){
+  let yearsLabel 
+  const currYear = date.getFullYear() || new Date().getFullYear()
+  let disabledYears = []
+  const yearsList = []
+  let yearsRanges = oldRanges || []
+
+  // 禁用逻辑
+
+  const dateRanges = Array.from({length: 20}, (item, index) => currYear + index - 10 + 1)
+
+  // 判断谁在前面
+  if(yearsRanges.length == 0 || dateRanges[dateRanges.length - 1] < yearsRanges[yearsRanges.length - 1]){
+    yearsLabel = Array.from(new Set(dateRanges.concat(yearsRanges)));
+  } else {
+    yearsLabel = Array.from(new Set(yearsRanges.concat(dateRanges)));
+  }
+  
+
+  (ranges || []).forEach(range => {
+    const value = range.map(date => date.getFullYear())
+    disabledYears = disabledYears.concat(newArray(value[0], value[1]))
+  })
+
+  if(disabledYears.length){
+    for(let i = 0; i < yearsLabel.length; i++){
+      yearsList[i] = disabledYears.indexOf(yearsLabel[i]) === -1
+    } 
+  } else {
+    for(let i = 0; i < yearsLabel.length; i++){
+      yearsList[i] = false
+    }
+  }
+
+  return { yearsList, yearsLabel}
+}
+
+export function getRangeMonths(ranges){
+  const months = []
+  let disabledMonths = [];
+
+  (ranges || []).forEach(range => {
+    const value = range.map(date => date.getMonth())
+    disabledMonths = disabledMonths.concat(newArray(value[0], value[1]))
+  })
+
+  if(disabledMonths.length){
+    for(let i = 0; i < 12; i++){
+      months[i] = disabledMonths.indexOf(i) === -1
+    }
+  } else {
+    for(let i = 0; i < 12; i++){
+      months[i] = false
+    }
+  }
+
+  return months
+}
+
+export function getRangeDays(current, ranges){
+  const days = []
+  const currentDate = current || new Date()
+  const monthLength = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
+  let disabledDays = [];
+
+  (ranges || []).forEach(range => {
+    const value = range.map(date => date.getDate())
+    disabledDays = disabledDays.concat(newArray(value[0], value[1]))
+  })
+
+  if(disabledDays.length){
+    for(let i = 0; i < monthLength; i++){
+      days[i] = disabledDays.indexOf(i) === -1
+    }
+  } else {
+    for(let i = 0; i < monthLength; i++){
+      days[i] = false
+    }    
+  }
+
+  return days
+}
+
 export function getRangeHours(ranges){
   const hours = []
   let disabledHours = [];
@@ -64,6 +147,8 @@ export function getRangeHours(ranges){
 
   return hours
 }
+
+
 
 export function getRangeMinutes(ranges, hour){
   const minutes = new Array(60)

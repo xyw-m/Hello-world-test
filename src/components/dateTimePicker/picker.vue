@@ -8,19 +8,27 @@
     v-if="!ranged"
     @input="value => userInput = value"
     @focus="handleFocus"
-    @change="handleChange">
+    @change="handleChange"
+    @mouseenter.native="handleMouseEnter"
+    @mouseleave.native="showClose = false">
+    <i slot="prefix" class="el-input__icon editor-icon" :class="triggerClass" style="font-size: 18px;"></i>
     <i 
-      slot="prefix"
-      class="el-input__icon"
-      :class="triggerClass"
+      v-if="haveTrigger"
+      slot="suffix" 
+      class="el-input__icon close-icon editor-icon" 
+      style="font-size: 18px;"
+      :class="[ showClose ? 'el-icon-circle-close' : '']"
+      @click="handleClickClose"
       ></i>
   </el-input>
   <div
     v-else
     ref="reference"
     class="date-range-editor"
-    v-clickoutside="handleClose">
-    <span class="range-icon">
+    v-clickoutside="handleClose"
+    @mouseenter="handleMouseEnter"
+    @mouseleave="showClose = false">
+    <span class="range-icon editor-icon">
       <i :class="['el-input__icon', triggerClass]"></i>
     </span>
     <!-- 开始时间 -->
@@ -44,6 +52,14 @@
       @focus="handleFocus"
       @input="handleEndInput"
       @change="handleEndChange">
+    <span class="range-icon">
+      <i 
+        v-if="haveTrigger"
+        class="el-input__icon close-icon editor-icon" 
+        :class="[ showClose ? 'el-icon-circle-close' : '']"
+        @click="handleClickClose"
+        ></i>
+    </span>
   </div>
 </template>
 <script>
@@ -204,6 +220,10 @@ const TYPE_VALUE_RESOLVER_MAP = {
   datetimerange: {
     formatter: RANGE_FORMATTER,
     parser: RANGE_PARSER
+  },
+  date: {
+    formatter: DATE_FORMATTER,
+    parser: DATE_PARSER
   }
 }
 
@@ -220,6 +240,7 @@ export default {
       userInput: null,
       picker: null,
       valueOnOpen: null,  // value when picker opens, used to determine whether to emit change
+      showClose: false
     }
   },
   
@@ -251,7 +272,10 @@ export default {
       } else if(this.userInput !== null){
         return this.userInput
       } else if(formattedValue){
-        return this.type === 'dates' ? formattedValue.join(', ') : formattedValue
+        if(this.type.indexOf('date') !== -1){
+          formattedValue.replaceAll('-', '/')
+        }
+        return this.type === 'dates' ? formattedValue.join(', ').replaceAll('-', '/') : formattedValue
       } else {
         return ''
       }
@@ -295,6 +319,27 @@ export default {
     },
     ranged(){
       return this.type.indexOf('range') > -1
+    },
+    haveTrigger(){
+      if(typeof this.showTrigger !== 'undefined'){
+        return this.showTrigger
+      }
+      return HAVE_TRIGGER_TYPES.indexOf(this.type) !== -1
+    },
+    valueIsEmpty(){
+      const val = this.value
+      if(Array.isArray(val)){
+        for(let i = 0, len = val.length; i < len; i++){
+          if(val[i]){
+            return false
+          }
+        }
+      } else {
+        if(val){
+          return false
+        }
+      }
+      return true
     }
   },
 
@@ -342,7 +387,6 @@ export default {
       // this.updatePopper()
 
       this.picker.value = this.parsedValue 
-      console.log(this.parsedValue, 'parsedValue')
 
       this.$nextTick(() => {
         this.picker.adjustSpinners && this.picker.adjustSpinners()
@@ -350,7 +394,6 @@ export default {
     },
     mountPicker(){
       this.picker = new Vue(this.panel).$mount()
-      console.log(this.picker, 'picker in mountPicker')
       this.picker.defaultValue = this.defaultValue
       // 可以这样设置DOM元素width吗？
       this.popperElm = this.picker.$el; // 弹出层设置
@@ -406,6 +449,16 @@ export default {
           this.refInput[1].focus()
         }
       })
+    },
+    unmountPicker(){
+      if(this.picker){
+        this.picker.$destroy()
+        this.picker.$off()
+        if(typeof this.unwatchPickerOptions === 'function'){
+          this.unwatchPickerOptions()
+        }
+        this.picker.$el.parentNode.removeChild(this.picker.$el)
+      }
     },
     hidePicker(){
       if(this.picker){
@@ -526,6 +579,27 @@ export default {
           this.userInput = null
         }
       }
+    },
+    handleMouseEnter(){
+      if(this.readonly) return
+      if(!this.valueIsEmpty){
+        this.showClose = true
+      }
+    },
+    handleClickClose(event){
+      if(this.readonly) return
+      if(this.showClose){
+        this.valueOnOpen = this.value
+        event.stopPropagation()
+        this.emitInput(null)
+        this.emitChange(null)
+        this.showClose = false
+        if(this.picker && typeof this.picker.handleClear === 'function'){
+          this.picker.handleClear()
+        }
+      } else {
+        this.pickerVisible = !this.pickerVisible
+      }
     }
   },
 
@@ -549,6 +623,24 @@ export default {
 .date-editor, .date-range-editor {
   width: 256px;
   border-radius: 3px;
+  &:hover {
+    border-color: #0A7CFF;
+  }
+  ::v-deep input {
+    font-size: 12px;
+    border-color: #0A7CFF;
+  }
+}
+
+::v-deep .date-editor {
+  span {
+    font-size: 18px;
+  }
+}
+
+::v-deep .close-icon {
+  color: #C0C4CC;
+  cursor: pointer;
 }
 
 .date-range-editor {
@@ -570,5 +662,12 @@ export default {
       outline: none;
     }
   }
+
+  ::v-deep .editor-icon {
+    font-size: 18px;
+    margin-left: 2px;
+  }
+
+
 }
 </style>
