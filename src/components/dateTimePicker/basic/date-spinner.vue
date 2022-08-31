@@ -90,7 +90,7 @@ export default {
       return getRangeYears(this.yearsLabel, this.date, this.selectableRange).yearsList
     },
     monthsList(){
-      return getRangeMonths(this.selectableRange)
+      return getRangeMonths(this.date, this.selectableRange)
     },
     daysList(){
       return getRangeDays(this.date, this.selectableRange)
@@ -214,11 +214,11 @@ export default {
       position: absolute;
       border-top: 16px solid #E6F1FF;
       border-bottom: 16px solid #E6F1FF;
-      border-left: 18px solid #E6F1FF;
-      border-right: 18px solid #E6F1FF;
+      border-left: 22px solid #E6F1FF;
+      border-right: 22px solid #E6F1FF;
       border-radius: 3px;
       z-index: -1;
-      left: 9px;
+      left: 5px;
       top: 43%;
     }
   }

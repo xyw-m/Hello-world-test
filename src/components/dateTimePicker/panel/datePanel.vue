@@ -15,10 +15,10 @@
         :date="date"
         @change="handleChange">
       </date-spinner>
-      <!-- <div class="panel-footer">
+      <div class="panel-footer">
         <el-button size="mini" @click="handleCancel">取消</el-button>
-        <el-button size="mini" type="primary" @click="handleConfirm()">确认</el-button>
-      </div> -->
+        <el-button size="mini" type="primary" @click="handleConfirm()" :disabled="!isValidValue(this.date)">确认</el-button>
+      </div>
     </div>
   </transition>
 </template>
@@ -57,7 +57,11 @@ export default {
     value(newVal){
       let date
       if(newVal instanceof Date){
-        date = limitTimeRange(newVal, this.selectableRange, this.format)
+        if(this.isValidValue(newVal)){
+          date = newVal
+        } else {
+          date = this.selectableRange[0]
+        }
       } else if(!newVal) {
         date = this.defaultValue ? new Date(this.defaultValue) : new Date()
       }
@@ -74,20 +78,15 @@ export default {
       return this.$refs.spinner.adjustSpinners()
     },
     isValidValue(value) {
-      return value && !isNaN(value) && (
-        typeof this.disabledDate === 'function'
-          ? !this.disabledDate(value)
-          : true
-      ) && this.checkDateWithinRange(value);
-    },
-    checkDateWithinRange(date) {
-      return this.selectableRange.length > 0
-        ? timeWithinRange(date, this.selectableRange, this.format || 'HH:mm:ss')
-        : true;
+      const min = this.selectableRange[0] ? this.selectableRange[0].getTime() : Number.NEGATIVE_INFINITY
+      const max = this.selectableRange[1] ? this.selectableRange[1].getTime() : Number.POSITIVE_INFINITY
+      return value && !isNaN(value)  && new Date(value).getTime() >= min &&
+            new Date(value).getTime() <= max
     },
     handleChange(date){
       if(this.visible){
         this.date = clearMilliseconds(date)
+        this.$refs.spinner.selectableRange = this.selectableRange
         if(this.isValidValue(this.date)){
           this.$emit('pick', this.date, true)
         }
@@ -98,8 +97,11 @@ export default {
     },
     handleConfirm(visible = false, first){
       if(first) return
-      const date = clearMilliseconds(limitTimeRange(this.date, this.selectableRange, this.format))
-      this.$emit('pick', date, visible, first)
+      if(this.isValidValue(this.date)){
+        this.$emit('pick', this.date, visible)
+      } else {
+        this.handleCancel()
+      }
     },
     setSelectionRange(start, end){
       this.$emit('select-range', start, end)
@@ -144,6 +146,8 @@ export default {
       font-size: 12px;
       font-family: 'MicrosoftYaHei';
       color: #222222;
+      line-height: 30px;
+      margin-left: -1px;
     }
   }
 

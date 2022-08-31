@@ -18,14 +18,14 @@
         @select-range="setSelectionRange"></time-spinner>
       <div class="panel-footer">
         <el-button size="mini" @click="handleCancel">取消</el-button>
-        <el-button size="mini" type="primary" @click="handleConfirm()">确认</el-button>
+        <el-button size="mini" type="primary" @click="handleConfirm()" :disabled="!isValidValue(date)">确认</el-button>
       </div>
     </div>
   </transition>
 </template>
 <script>
 import timeSpinner from '../basic/time-spinner.vue'
-import { clearMilliseconds, limitTimeRange, timeWithinRange } from '../utils/date-util.js'
+import { clearMilliseconds, isDate, limitTimeRange, timeWithinRange, modifyTime } from '../utils/date-util.js'
 export default {
   components: { timeSpinner },
 
@@ -59,13 +59,24 @@ export default {
       let date;
       if(newVal instanceof Date){
         date = limitTimeRange(newVal, this.selectableRange, this.format)
+        // 改为当前日期
+        date = modifyTime(this.date, date.getHours(), date.getMinutes(), date.getSeconds())
       } else if(!newVal){
         date = this.defaultValue ? new Date(this.defaultValue) : new Date()
       }
+
       this.date = date
       if(this.visible && this.needInitAdjust){
         this.$nextTick(_ => this.adjustSpinners())
         this.needInitAdjust = false
+      }
+    },
+    selectableRange(val){
+      this.$refs.spinner.selectableRange = val
+    },
+    defaultValue(val){
+      if(!isDate(this.value)){
+        this.date = val ? new Date(val) : new Date()
       }
     }
   },
@@ -142,6 +153,8 @@ export default {
       font-size: 12px;
       font-family: 'MicrosoftYaHei';
       color: #222222;
+      line-height: 30px;
+      margin-left: -1px;
     }
   }
 

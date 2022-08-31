@@ -4,6 +4,8 @@
     class="date-editor"
     placeholder="请选择时间"
     :value="displayValue"
+    :disabled="disabled"
+    :readonly="inputReadOnly"
     v-clickoutside="handleClose"
     v-if="!ranged"
     @input="value => userInput = value"
@@ -26,6 +28,7 @@
     ref="reference"
     class="date-range-editor"
     v-clickoutside="handleClose"
+    :class="[ disabled ? 'is-disabled' : '']"
     @mouseenter="handleMouseEnter"
     @mouseleave="showClose = false">
     <span class="range-icon editor-icon">
@@ -36,6 +39,8 @@
       auto-complete="off"
       placeholder="开始时间"
       :value="displayValue && displayValue[0]"
+      :disabled="disabled"
+      :readonly="inputReadOnly"
       class="range-input"
       @focus="handleFocus"
       @input="handleStartInput"
@@ -47,6 +52,8 @@
     <input
       auto-complete="off"
       placeholder="结束时间"
+      :disabled="disabled"
+      :readonly="inputReadOnly"
       :value="displayValue && displayValue[1]"
       class="range-input"
       @focus="handleFocus"
@@ -64,7 +71,7 @@
 </template>
 <script>
 import Vue from 'vue'
-import { formatDate, parseDate, isDateObject } from './utils/date-util'
+import { formatDate, parseDate, isDateObject, modifyTime } from './utils/date-util'
 import Popper from 'element-ui/src/utils/vue-popper'
 import merge from 'element-ui/src/utils/merge'
 import clickoutside from 'element-ui/src/utils/clickoutside'
@@ -95,7 +102,9 @@ const HAVE_TRIGGER_TYPES = [
   'monthrange',
   'timerange',
   'datetimerange',
-  'dates'
+  'dates',
+  'datetimeselect',
+  'time-selectrange'
 ]
 
 const DEFAULT_FORMATS = {
@@ -108,7 +117,9 @@ const DEFAULT_FORMATS = {
   daterange: 'yyyy-MM-dd',
   monthrange: 'yyyy-MM',
   datetimerange: 'yyyy-MM-dd HH:mm:ss',
-  year: 'yyyy'
+  year: 'yyyy',
+  datetimeselect: 'yyyy-MM-dd HH:mm',
+  'time-selectrange': 'HH:mm'
 }
 
 const valueEquals = function(a, b) {
@@ -224,6 +235,22 @@ const TYPE_VALUE_RESOLVER_MAP = {
   date: {
     formatter: DATE_FORMATTER,
     parser: DATE_PARSER
+  },
+  daterange: {
+    formatter: RANGE_FORMATTER,
+    parser: RANGE_PARSER
+  },
+  datetime: {
+    formatter: DATE_FORMATTER,
+    parser: DATE_PARSER
+  },
+  datetimeselect: {
+    formatter: DATE_FORMATTER,
+    parser: DATE_PARSER
+  },
+  'time-selectrange': {
+    formatter: RANGE_FORMATTER,
+    parser: RANGE_PARSER
   }
 }
 
@@ -263,7 +290,7 @@ export default {
 
   computed: {
     displayValue(){
-      const formattedValue = formatAsFormatAndType(this.parsedValue, this.format, this.type, this.rangeSeparator)
+      let formattedValue = formatAsFormatAndType(this.parsedValue, this.format, this.type, this.rangeSeparator)
       if(Array.isArray(this.userInput)){
         return [
           this.userInput[0] || (formattedValue && formattedValue[0]) || '',
@@ -272,10 +299,15 @@ export default {
       } else if(this.userInput !== null){
         return this.userInput
       } else if(formattedValue){
-        if(this.type.indexOf('date') !== -1){
-          formattedValue.replaceAll('-', '/')
+        if(this.type === 'date'){
+          formattedValue = formattedValue.replaceAll('-', '/')
+        } else if(this.type === 'datetime' || this.type === 'datetimeselect'){
+          formattedValue = formattedValue.replaceAll('-', '/')
+          formattedValue = formattedValue.replace(' ', ' - ')
+        } else if(this.type === 'daterange'){
+          formattedValue = formattedValue.map(val => val.replaceAll('-', '/'))
         }
-        return this.type === 'dates' ? formattedValue.join(', ').replaceAll('-', '/') : formattedValue
+        return formattedValue
       } else {
         return ''
       }
@@ -312,13 +344,67 @@ export default {
         return (this.value, this.parseAsFormatAndTypevalueFormat, this.type, this.rangeSeparator) || this.value;
       } 
 
+      if(this.type === 'time'){
+        const text = this.value.split(':')
+        const hours = parseInt(text[0])
+        const minutes = parseInt(text[1])
+        const seconds = parseInt(text[2])
+        const current = new Date()
+        return new Date(current.getFullYear(), current.getMonth(), current.getDate(), hours, minutes, seconds)
+      }
+
+      if(this.type === 'timerange'){
+        const result = []
+        if(Array.isArray(this.value)){
+          this.value.map(val => {
+            if(isDateObject(val)){
+              result.push(new Date(val))
+            } else {
+              const text = val.split(':')
+              const hours = parseInt(text[0])
+              const minutes = parseInt(text[1])
+              const seconds = parseInt(text[2])
+              const current = new Date()
+              result.push(new Date(current.getFullYear(), current.getMonth(), current.getDate(), hours, minutes, seconds))
+            }
+          })
+        }
+        if(result[0].getTime() <= result[1].getTime()){
+          return result
+        } else {
+          throw new Error(`Invalid value: ${this.value}`)
+        }
+      }
+
+      if(this.type === 'time-selectrange'){
+        const result = []
+        if(Array.isArray(this.value)){
+          this.value.map(val => {
+            if(isDateObject(val)){
+              result.push(new Date(val))
+            } else {
+              const text = val.split(':')
+              const hours = parseInt(text[0])
+              const minutes = parseInt(text[1])
+              const current = new Date()
+              result.push(new Date(current.getFullYear(), current.getMonth(), current.getDate(), hours, minutes, 0))
+            } 
+          })
+        }
+        if(result[0].getTime() <= result[1].getTime()){
+          return result
+        } else {
+          throw new Error(`Invalid value: ${this.value}`)
+        }
+      }
+
       return Array.isArray(this.value) ? this.value.map(val => new Date(val)) : new Date(this.value)
     },
     triggerClass(){
       return this.type.indexOf('time') !== -1 ? 'el-icon-time' : 'el-icon-date'
     },
     ranged(){
-      return this.type.indexOf('range') > -1
+      return this.type.indexOf('range') > -1 
     },
     haveTrigger(){
       if(typeof this.showTrigger !== 'undefined'){
@@ -340,6 +426,9 @@ export default {
         }
       }
       return true
+    },
+    inputReadOnly(){
+      return this.readonly || this.type === 'time-selectrange' || this.type === 'datetimeselect'
     }
   },
 
@@ -369,6 +458,13 @@ export default {
   },
 
   methods: {
+    focus(){
+      if(!this.ranged){
+        this.$refs.reference.focus()
+      } else {
+        this.handleFocus()
+      }
+    },
     handleFocus(){
       const type = this.type
 
@@ -381,6 +477,7 @@ export default {
       if(!this.picker){
         this.mountPicker()
       }
+
 
       this.pickerVisible = this.picker.visible = true
 
@@ -406,13 +503,25 @@ export default {
       const updateOptions = () => {
         const options = this.pickerOptions || null
 
-        if(options && options.selectableRange){
+        if(options && options.selectableRange && (this.type === 'time' || this.type === 'date')){
           let ranges = options.selectableRange
           const parser = TYPE_VALUE_RESOLVER_MAP.datetimerange.parser
-          const format = DEFAULT_FORMATS.timerange
+          const format =  DEFAULT_FORMATS.timerange
+
 
           ranges = Array.isArray(ranges) ? ranges : [ranges]
-          this.picker.selectableRange = ranges.map(range => parser(range, format, this.rangeSeparator))
+          this.picker.selectableRange = ranges.map(range => parser(range, format, '-'))
+          if(this.type === 'date'){
+            ranges = ranges[0].split(' - ')
+            this.picker.selectableRange = ranges.map(range => {
+              let date = new Date(range)
+              const hours = ranges.indexOf(range) === 0 ? 0 : 23
+              const minutes = ranges.indexOf(range) === 0 ? 0 : 39
+              const seconds = ranges.indexOf(range) === 0 ? 0 : 59
+              return new Date(date.getFullYear(), date.getMonth(), date.getDate(), hours, minutes, seconds)
+            })
+            
+          }
         }
 
         for(const option in options){
@@ -466,15 +575,38 @@ export default {
         this.destroyPopper()
       }
     },
-    emitInput(val){
-      const formatted = this.formatToValue(val)
+    emitInput(value){
+      let formatted = this.formatToValue(value)
       if(!valueEquals(this.value, formatted)){
+        if(this.type === 'time-selectrange'){
+          const result = []
+          if(Array.isArray(value)){
+            value.map(val => {
+              if(typeof val === 'string'){
+                result.push(val)
+              } else {
+                const hours = val.getHours()
+                const minutes = val.getMinutes()
+                result.push((hours < 10 ? '0' + hours : hours) + ':' + (minutes < 10 ? '0' + minutes : minutes))
+              }
+            })
+          }
+          formatted = result
+        }
         this.$emit('input', formatted)
       }
     },
     emitChange(val){
       // determine user real change only
       if(!valueEquals(val, this.valueOnOpen)){
+        if(this.type === 'time-selectrange' && Array.isArray(val)){
+          val = val.map(date => {
+            if(typeof date === 'string') return date
+            const hours = date.getHours()
+            const minutes = date.getMinutes()
+            return (hours < 10 ? '0' + hours : hours) + ':' + (minutes < 10 ? '0' + minutes : minutes)
+          })
+        }
         this.$emit('change', val)
         this.valueOnOpen = val
       }
@@ -492,8 +624,7 @@ export default {
     formatToValue(date){
       const isFormattable = isDateObject(date) || (Array.isArray(date) && date.every(isDateObject))
       if(this.valueFormat && isFormattable){
-        return ''
-        // return formatAsFormatAndType(date, this.valueFormat, this.type, this.rangeSeparator)
+        return formatAsFormatAndType(date, this.valueFormat, this.type, this.rangeSeparator)
       } else {
         return date
       }
@@ -524,7 +655,14 @@ export default {
       }
     },
     handleChange(){
+      
       if(this.userInput){
+        if(this.type === 'date'){
+          this.userInput = this.userInput.replaceAll('/', '-')
+        } else if(this.type === 'datetime'){
+          this.userInput = this.userInput.replace(' - ', ' ')
+          this.userInput = this.userInput.replaceAll('/', '-')
+        }
         const value = this.parseString(this.displayValue)
         if(value){
           this.picker.value = value
@@ -549,10 +687,16 @@ export default {
       }
     },
     handleStartChange(event){
+      if(this.type === 'daterange' && this.userInput && this.userInput[0]){
+        this.userInput[0] = this.userInput[0].replaceAll('/', '-')
+      }
       const value = this.parseString(this.userInput && this.userInput[0])
       if(value){
         this.userInput = [this.formatToString(value), this.displayValue[1]]
         const newValue = [value, this.picker.value && this.picker.value[1]]
+        if(this.type === 'timerange'){
+          newValue[0] = modifyTime(this.picker.value[1], value.getHours(), value.getMinutes(), value.getSeconds())
+        }
         this.picker.value = newValue
         if(this.isValidValue(newValue)){
           this.emitInput(newValue)
@@ -568,12 +712,17 @@ export default {
       }
     },
     handleEndChange(event){
+      if(this.type === 'daterange' && this.userInput && this.userInput[1]){
+        this.userInput[1] = this.userInput[1].replaceAll('/', '-')
+      }
       const value = this.parseString(this.userInput && this.userInput[1])
       if(value){
         this.userInput = [this.displayValue[0], this.formatToString(value)]
         const newValue = [this.picker.value && this.picker.value[0], value]
+        if(this.type === 'timerange'){
+          newValue[1] = modifyTime(this.picker.value[0], value.getHours(), value.getMinutes(), value.getSeconds())
+        }
         this.picker.value = newValue
-
         if(this.isValidValue(newValue)){
           this.emitInput(newValue)
           this.userInput = null
@@ -581,13 +730,13 @@ export default {
       }
     },
     handleMouseEnter(){
-      if(this.readonly) return
+      if(this.readonly || this.disabled) return
       if(!this.valueIsEmpty){
         this.showClose = true
       }
     },
     handleClickClose(event){
-      if(this.readonly) return
+      if(this.readonly || this.disabled ) return
       if(this.showClose){
         this.valueOnOpen = this.value
         event.stopPropagation()
@@ -667,7 +816,20 @@ export default {
     font-size: 18px;
     margin-left: 2px;
   }
+}
+.is-disabled {
+  background-color: #F5F7FA;
+  cursor: not-allowed;
+  input {
+    background-color: #F5F7FA;
+    cursor: not-allowed;
+    &::placeholder {
+      color: #C0C4CC;
+    }
+  }
 
-
+  ::v-deep .range-separator {
+    color: #C0C4CC;
+  }
 }
 </style>

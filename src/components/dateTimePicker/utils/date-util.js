@@ -41,14 +41,12 @@ export function parseDate(string, format){
   return fecha.parse(string, format || 'yyyy-MM-dd')
 }
 
-export function getRangeYears(oldRanges, date,  ranges){
+export function getRangeYears(oldRanges, date, ranges){
+  const selectableRange = ranges || []
   let yearsLabel 
   const currYear = date.getFullYear() || new Date().getFullYear()
-  let disabledYears = []
   const yearsList = []
   let yearsRanges = oldRanges || []
-
-  // 禁用逻辑
 
   const dateRanges = Array.from({length: 20}, (item, index) => currYear + index - 10 + 1)
 
@@ -60,14 +58,12 @@ export function getRangeYears(oldRanges, date,  ranges){
   }
   
 
-  (ranges || []).forEach(range => {
-    const value = range.map(date => date.getFullYear())
-    disabledYears = disabledYears.concat(newArray(value[0], value[1]))
-  })
-
-  if(disabledYears.length){
+  if(selectableRange.length){
+    // 禁用逻辑
+    const minValue = Math.abs(selectableRange[0]) === Infinity ? selectableRange[0] : selectableRange[0].getFullYear()
+    const maxValue = Math.abs(selectableRange[1]) === Infinity ? selectableRange[1] : selectableRange[1].getFullYear()
     for(let i = 0; i < yearsLabel.length; i++){
-      yearsList[i] = disabledYears.indexOf(yearsLabel[i]) === -1
+      yearsList[i] = (yearsLabel[i] < minValue || yearsLabel[i] > maxValue)
     } 
   } else {
     for(let i = 0; i < yearsLabel.length; i++){
@@ -78,18 +74,19 @@ export function getRangeYears(oldRanges, date,  ranges){
   return { yearsList, yearsLabel}
 }
 
-export function getRangeMonths(ranges){
+export function getRangeMonths(date, ranges){
   const months = []
-  let disabledMonths = [];
+  const selectableRange = ranges || []
+  const currentYear = date.getFullYear() || new Date().getFullYear()
 
-  (ranges || []).forEach(range => {
-    const value = range.map(date => date.getMonth())
-    disabledMonths = disabledMonths.concat(newArray(value[0], value[1]))
-  })
-
-  if(disabledMonths.length){
+  if(selectableRange.length){
+    // 禁用逻辑
+    const minValue = Math.abs(selectableRange[0]) === Infinity ? selectableRange[0] : 
+                                                        new Date(selectableRange[0].getFullYear(), selectableRange[0].getMonth()).getTime()
+    const maxValue = Math.abs(selectableRange[1]) === Infinity ? selectableRange[1] : 
+                                                        new Date(selectableRange[1].getFullYear(), selectableRange[1].getMonth()).getTime()
     for(let i = 0; i < 12; i++){
-      months[i] = disabledMonths.indexOf(i) === -1
+      months[i] = (new Date(currentYear, i).getTime() < minValue || new Date(currentYear, i).getTime() > maxValue)
     }
   } else {
     for(let i = 0; i < 12; i++){
@@ -100,20 +97,22 @@ export function getRangeMonths(ranges){
   return months
 }
 
-export function getRangeDays(current, ranges){
+export function getRangeDays(date, ranges){
+  const selectableRange = ranges || [] 
   const days = []
-  const currentDate = current || new Date()
-  const monthLength = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
-  let disabledDays = [];
+  const currentYear = date.getFullYear() || new Date().getFullYear()
+  const currentMonth = date.getMonth() || new Date().getMonth()
+  const monthLength = new Date(currentYear, currentMonth + 1, 0).getDate();
 
-  (ranges || []).forEach(range => {
-    const value = range.map(date => date.getDate())
-    disabledDays = disabledDays.concat(newArray(value[0], value[1]))
-  })
-
-  if(disabledDays.length){
+  if(selectableRange.length){
     for(let i = 0; i < monthLength; i++){
-      days[i] = disabledDays.indexOf(i) === -1
+      // 禁用逻辑
+      const minValue = Math.abs(selectableRange[0]) === Infinity ? selectableRange[0] : 
+                          new Date(selectableRange[0].getFullYear(), selectableRange[0].getMonth(), selectableRange[0].getDate()).getTime()
+      const maxValue = Math.abs(selectableRange[1]) === Infinity ? selectableRange[1] : 
+                          new Date(selectableRange[1].getFullYear(), selectableRange[1].getMonth(), selectableRange[1].getDate()).getTime()
+      days[i] = (new Date(currentYear, currentMonth, i + 1).getTime() < minValue || 
+                  new Date(currentYear, currentMonth, i + 1).getTime() > maxValue)
     }
   } else {
     for(let i = 0; i < monthLength; i++){

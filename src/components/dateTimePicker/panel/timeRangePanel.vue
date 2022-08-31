@@ -40,14 +40,14 @@
       </div>
       <div class="panel-footer">
         <el-button size="mini" @click="handleCancel">取消</el-button>
-        <el-button size="mini" type="primary" @click="handleConfirm()">确定</el-button>
+        <el-button size="mini" type="primary" @click="handleConfirm()" :disabled="!isValidValue([minDate, maxDate])">确定</el-button>
       </div>
     </div>
   </transition>
 </template>
 <script>
 import timeSpinner from '../basic/time-spinner.vue'
-import { parseDate, modifyDate, clearMilliseconds, timeWithinRange, limitTimeRange } from '../utils/date-util.js'
+import { parseDate, modifyDate, clearMilliseconds, timeWithinRange, limitTimeRange, modifyTime } from '../utils/date-util.js'
 
 const MIN_TIME = parseDate('00:00:00', 'HH:mm:ss')
 const MAX_TIME = parseDate('23:59:59', 'HH:mm:ss')
@@ -75,6 +75,7 @@ export default {
       format: 'HH:mm:ss',
       visible: false,
       selectionRange: [0, 2],
+      selectableRange: [],
       defaultValue: null,
     }
   },
@@ -91,20 +92,29 @@ export default {
   watch: {
     value(value){
       if(Array.isArray(value)){
-        this.minDate = new Date(value[0])
-        this.maxDate = new Date(value[1])
+        console.log(value, 'value in watch')
+        if(this.isValidValue(value)){
+          this.minDate = modifyTime(this.minDate, value[0].getHours(), value[0].getMinutes(), value[0].getSeconds())
+          this.maxDate = modifyTime(this.maxDate, value[1].getHours(), value[1].getMinutes(), value[1].getSeconds())
+        } else {
+          this.minDate = new Date()
+          this.maxDate = new Date()
+        }
       } else {
         if(Array.isArray(this.defaultValue)){
           this.minDate = new Date(this.defaultValue[0])
           this.maxDate = new Date(this.defaultValue[1])
         } else if(this.defaultValue){
           this.minDate = new Date(this.defaultValue)
-          this.maxDate = advanceTime(new Date(this.defaultValue), 60 * 60 * 1000)
+          // this.maxDate = advanceTime(new Date(this.defaultValue), 60 * 60 * 1000)
+          this.maxDate = new Date(this.defaultValue)
         } else {
           this.minDate = new Date()
-          this.maxDate = advanceTime(new Date(), 60 * 60 * 1000)
+          // this.maxDate = advanceTime(new Date(), 60 * 60 * 1000)
+          this.maxDate = new Date()
         }
       }
+      
     },
     visible(val){
       if(val){
@@ -129,6 +139,27 @@ export default {
     },
     handleChange(){
       if(this.isValidValue([this.minDate, this.maxDate])){
+        // if(this.selectableRange[0].length > 0){
+        //   this.selectableRange[0] = this.selectableRange[0].map( date => {
+        //     return new Date(this.minDate.getFullYear(), this.minDate.getMonth(), this.minDate.getDate(), date.getHours(), date.getMinutes(), date.getSeconds())
+        //   })
+        //   console.log(this.selectableRange[0])
+        // }
+        // const min = this.selectableRange[0][0] || minTimeOfDay(this.minDate)
+        // const max = this.selectableRange[0][1] || maxTimeOfDay(this.maxDate)
+
+        // if(this.minDate.getTime() < min.getTime()){
+        //   this.minDate = min
+        //   console.log(min, '')
+        // } 
+        // if(this.maxDate.getTime() > max.getTime()){
+        //   this.maxDate = max
+        // } else if(this.maxDate.getTime() < min.getTime()){
+        //   this.maxDate = max
+        // }
+
+        // this.adjustSpinners()
+
         this.$refs.minSpinner.selectableRange = [[minTimeOfDay(this.minDate), this.maxDate]]
         this.$refs.maxSpinner.selectableRange = [[this.minDate, maxTimeOfDay(this.maxDate)]]
         this.$emit('pick', [this.minDate, this.maxDate], true)
@@ -140,6 +171,7 @@ export default {
     handleConfirm(visible = false){
       const minSelectableRange = this.$refs.minSpinner.selectableRange
       const maxSelectableRange = this.$refs.maxSpinner.selectableRange
+
 
       this.minDate = limitTimeRange(this.minDate, minSelectableRange, this.format)
       this.maxDate = limitTimeRange(this.maxDate, maxSelectableRange, this.format)
@@ -159,9 +191,13 @@ export default {
       this.selectionRange = [start + this.offset, end + this.offset]
     },
     isValidValue(date){
-      return Array.isArray(date) && 
-        timeWithinRange(this.minDate, this.$refs.minSpinner.selectableRange) &&
-        timeWithinRange(this.maxDate, this.$refs.maxSpinner.selectableRange)
+      // return Array.isArray(date) && 
+      //   timeWithinRange(date[0], this.$refs.minSpinner ? this.$refs.minSpinner.selectableRange : []) &&
+      //   timeWithinRange(date[1], this.$refs.maxSpinner ? this.$refs.maxSpinner.selectableRange : [])
+      const formattedMin = modifyTime(this.minDate, date[0].getHours(), date[0].getMinutes(), date[0].getSeconds())
+      const formattedMax = modifyTime(this.maxDate, date[1].getHours(), date[1].getMinutes(), date[1].getSeconds())
+      return Array.isArray(date) && formattedMin.getTime() <= formattedMax.getTime()
+              
     }
   }
 }
@@ -211,6 +247,8 @@ export default {
       font-size: 12px;
       font-family: 'MicrosoftYaHei';
       color: #222222;
+      line-height: 30px;
+      margin-left: -1px;
     }
   }
 

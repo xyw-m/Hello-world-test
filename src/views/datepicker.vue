@@ -1,67 +1,102 @@
 <template>
   <div class="datePicker">
-    <el-date-picker v-model="value1" type="date" placeholder="选择日期"></el-date-picker>
-    <!-- <el-time-picker
-      v-model="value1"
-      placeholder="任意时间点"
-      ref="el-time-picker"
+    <h4>时间及时间范围任意选择</h4>
+    
+    <time-picker
+      v-model="timeValue"
       @change="handleChange"
-      is-range
-      key="11"
-      ></el-time-picker>
-    <el-time-picker
-      v-model="value2"
-      placeholder="任意时间点"
-      ref="el-time-picker"
-      @change="handleChange"
-      key="22"
-    ></el-time-picker> -->
-    <!---------------------divider---------------------->
-    <el-divider></el-divider>
-    <div class="haveDone">
-      <date-picker
-        v-model="dateValue"
-        @change="dateChange"></date-picker>
-    </div>
+      class="haveDone"
+      :picker-options="{
+        selectableRange: '18:30:00 - 20:30:00'
+      }"
+      ></time-picker>
     <div class="haveDone">
       <time-picker
-        v-model="diyValue2"
-        @change="timeChange"
-        key="notRange"></time-picker>
+        v-model="timeRangeValue"
+        isRange
+        @change="handleChange"
+        ></time-picker>
     </div>
-    <div>如果下边还有东西呢？会被覆盖吗？？</div>
+    <el-divider></el-divider>
+     <h4>日期及日期范围任意选择</h4>
+    <date-picker
+      v-model="dateValue"
+      class="haveDone"
+      @change="handleChange"
+      :picker-options="{
+        selectableRange: '2022-08-01 - 2022-08-31'
+      }"
+      ></date-picker>
+    <div class="haveDone">
+      <date-picker
+        v-model="dateRangeValue"
+        type="daterange"
+        @change="handleChange"
+        ></date-picker>
+    </div>
+    <el-divider></el-divider>
+     <h4>日期时间选择</h4>
+    <div class="haveDone">
+      <date-picker
+        v-model="datetimeValue"
+        type="datetime"
+        @change="handleChange"
+        ></date-picker>
+    </div> 
+    <div class="haveDone">
+      <date-picker
+        v-model="dateTimeSelectValue"
+        @change="handleChange"
+        type="datetimeselect"
+        ></date-picker>
+    </div>
+    <el-divider></el-divider>
+     <h4>固定时间点选择</h4>
+     <div class="haveDone">
+      <time-select
+        v-model="timeSelectValue"
+        @change="handleChange"
+        type="time-select"
+        ></time-select>
+    </div>
+
+    <div class="haveDone">
+      <time-select
+        v-model="timeSelectRangeValue"
+        @change="handleChange"
+        type="time-selectrange"
+        ></time-select>
+    </div>
   </div>
 </template>
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator'
+import { Vue, Component, Watch } from 'vue-property-decorator'
 import timePicker from '@/components/dateTimePicker/picker/time-picker.js'
 import datePicker from '@/components/dateTimePicker/picker/date-picker.js'
+import timeSelect from '@/components/dateTimePicker/picker/time-select.js'
 @Component({
   name: 'datePickerView',
-  components: { timePicker, datePicker }
+  components: { timePicker, datePicker, timeSelect }
 })
 export default class datePickerView extends Vue {
-  value1 = ''
-  value2 = ''
-  diyValue1 = ''
-  diyValue2 = ''
-  dateValue = ''
 
-  timeChange(){
-    console.log(this.diyValue1, 'diyValue')
-  }
-  
-  mounted(){
-    console.log(this.$refs)
+
+  timeValue = '16:30:30'
+  dateValue = '2022-08-27'
+
+  timeRangeValue = ''
+  dateRangeValue = ['2022-08-01', '2022-08-30']
+
+  datetimeValue = 'Mon Aug 29 2022 08:57:04 GMT+0800 (中国标准时间)'
+  timeSelectValue = '10:30:00'
+
+  dateTimeSelectValue = 'Tue Aug 30 2022 00:00:00 GMT+0800 (中国标准时间)'
+  timeSelectRangeValue = ['00:00', '07:30'] 
+
+  handleChange(val:any){
+    console.log(val,'val')
   }
 
-  handleChange(){
-    console.log(this.$refs['el-time-picker'])
-  }
-
-  dateChange(){
-    console.log(this.dateValue, 'dateValue')
-  }
 }
 </script>
 <style lang="scss" scoped>

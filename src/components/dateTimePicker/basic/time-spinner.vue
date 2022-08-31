@@ -28,7 +28,7 @@
         v-for="(enabled, key) in minutesList"
         :key="key"
         class="timeSpinner-item"
-        :class="{ 'active': key === minutes }"
+        :class="{ 'active': key === minutes, 'disabled': !enabled }"
         @click="handleClick('minutes', { value: key, disabled: !enabled })">{{ ('0' + key).slice(-2) }}</li>
     </el-scrollbar>
     <!-- seconds -->
@@ -81,6 +81,7 @@ export default {
       return getRangeHours(this.selectableRange)
     },
     minutesList(){
+      
       return getRangeMinutes(this.selectableRange, this.hours)
     }
   },
@@ -117,7 +118,6 @@ export default {
       bindFunction('seconds')
     },
     handleScroll(type){
-      // console.log(this.$refs[type], 'type')
       const value = Math.min(Math.round((this.$refs[type].wrap.scrollTop - (this.scrollBarHeight(type) * 0.5 - 10) / this.typeItemHeight(type) + 3) / this.typeItemHeight(type)), (type === 'hours' ? 23 : 59));
       this.modifyDateField(type, value)
     },   
