@@ -6,34 +6,51 @@
             <el-submenu index="1">
                 <template slot="title">
                     <i class="el-icon-menu"></i>
-                    <span>11111111</span>
+                    <span>日志</span>
                 </template>
-                <el-menu-item index="/communication">父子应用通信</el-menu-item>
-                <el-menu-item index="/about">affix.md</el-menu-item>
-                <el-menu-item index="/test">test.md</el-menu-item>
-                <el-menu-item index="/playground">playground</el-menu-item>
-                <el-menu-item index="/collapse">collapse</el-menu-item>
-                <el-menu-item index="/xywui">xywui-test</el-menu-item>
-                <el-menu-item index="/store-app">child-web</el-menu-item>
-                <el-menu-item index="/zoom">zoom</el-menu-item>
-                <el-menu-item index="/list">list</el-menu-item>
-                <el-menu-item index="/datepicker">datepicker</el-menu-item>
-                <el-menu-item index="/fileUpload">文件上传</el-menu-item>
+                <el-menu-item index="/updateLog">更新日志</el-menu-item>
+            </el-submenu>
+            <el-submenu index="2">
+                <template slot="title">
+                    <i class="el-icon-menu"></i>
+                    <span>组件</span>
+                </template>
+                <el-menu-item 
+                    v-for="(menu, index) in menuList"
+                    :key="index"
+                    :index="menu.path">{{ menu.title }}</el-menu-item>
             </el-submenu>
         </el-menu>
     </div>
 </template>
 <script lang="ts">
-export default {
-    name: 'Aside',
-    data(){
-        return {
-            name: 'Aside',
-            friends: ['one', 'two', 'three', 'four']
+import { Vue, Component } from 'vue-property-decorator'
+import menuConfig from '@/menuConfig/config.json'
+
+@Component({
+    name: 'Aside'
+
+})
+export default class Aside extends Vue {
+
+    get menuList(){
+        const sidebarMenu:any = []
+        const formattedMenu = function(arr:any){
+            arr.forEach((item:any) => {
+                if(item.path){
+                    sidebarMenu.push({
+                        title: item.title,
+                        path: item.path
+                    })
+                } else if(item.groups){
+                    formattedMenu(item.groups)
+                }
+            })
         }
-    },
-    methods: {
+        formattedMenu(menuConfig)
+        return sidebarMenu
     }
+
 }
 </script>
 <style lang="scss" scoped>

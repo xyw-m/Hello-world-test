@@ -1,0 +1,52 @@
+[
+  {
+    "name": "组件",
+    "groups": [
+      {
+        "path": "/communication",
+        "title": "父子应用通信",
+        "module": "communication"
+      },
+      {
+        "path": "/collapse",
+        "title": "折叠菜单",
+        "module": "collapse"
+      },
+      {
+        "path": "/list",
+        "title": "列表",
+        "module": "list"
+      }, 
+      {
+        "path": "/affix",
+        "title": "固钉",
+        "module": "affix"
+      }, 
+      {
+        "path": "/xywui",
+        "title": "xywui",
+        "module": "xywuiTest"
+      }, 
+      {
+        "path": "/zoom",
+        "title": "zoom指令",
+        "module": "zoom"
+      }, 
+      {
+        "path": "/datepicker",
+        "title": "时间选择器",
+        "module": "datepicker"
+      },
+      {
+        "path": "/fileUpload",
+        "title": "文件上传",
+        "module": "fileUpload"
+      },
+      {
+        "path": "/notice",
+        "title": "通知提醒",
+        "module": "notice"
+      }
+    ]
+  }
+]

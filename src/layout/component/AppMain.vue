@@ -67,10 +67,9 @@ import { Component, Vue } from 'vue-property-decorator'
 import panzoom from 'panzoom'
 import * as d3 from 'd3-zoom'
 import * as d3S from "d3-selection"
-import About from '@/views/About.vue'
 import updateHooks from '@/views/updateHooks.vue'
 @Component({
-    components: { About, updateHooks},
+    components: {updateHooks},
     name: 'AppMain'
 })
 export default class AppMain extends Vue {
@@ -198,6 +197,8 @@ export default class AppMain extends Vue {
     margin-left:220px;
     font-size: 10px;
     line-height: 1.5;
+    width: calc(100% - 200px);
+    padding: 20px;
 }
 p {
     margin-left: auto;
