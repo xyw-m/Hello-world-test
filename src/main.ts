@@ -13,6 +13,7 @@ import xywui from 'xyw-ui'
 import { registerMicroApps, start } from 'qiankun'
 import './directives/index'
 import actions from './action.js'
+import  Notification from '@/components/Notification/index.js'
 
 // 消息提示的环境配置，设置为FALSE时不会显示开发模式中的一些警告信息
 Vue.config.productionTip = false
@@ -20,6 +21,10 @@ Vue.config.productionTip = false
 Vue.use(ElementUI);
 Vue.use(Antd)
 Vue.use(xywui)
+// Vue.use(nofifyInstall)
+setTimeout(() => {
+  Vue.prototype.$notify = Notification
+});
 
 registerMicroApps([
   {

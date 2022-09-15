@@ -32,6 +32,10 @@ const routes: Array<RouteConfig> = [
     name: 'Home',
     component: Home
   },
+  {
+    path: '/updateLog',
+    component: () => import('@/views/updateLog.vue')
+  },
   ...sidebarMenu
 ]
 
