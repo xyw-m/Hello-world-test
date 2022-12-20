@@ -36,6 +36,10 @@ const routes: Array<RouteConfig> = [
     path: '/updateLog',
     component: () => import('@/views/updateLog.vue')
   },
+  {
+    path: '/tempAjax',
+    component: () => import('@/views/devTest/tempAjax.vue')
+  },
   ...sidebarMenu
 ]
 

@@ -2,17 +2,21 @@
   <div class="home">
     <el-button @click="show = !show">click</el-button>
     <el-button @click="visible = !visible">自定义</el-button>
-  <transition name="slide-fade">
-    <p v-if="show">hello</p>
-  </transition>
-  <transition name="custom">
-    <span v-show="visible">what hell?</span>
-  </transition>
+    <transition name="slide-fade">
+      <p v-if="show">hello</p>
+    </transition>
+    <transition name="custom">
+      <span v-show="visible">what hell?</span>
+    </transition>
+    <div>fingerprintjs
+      <el-button @click="handleClick">获取visitorId</el-button>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import FingerprintJS from '@fingerprintjs/fingerprintjs'
 
 @Component({
   components: {
@@ -21,6 +25,15 @@ import { Component, Vue } from 'vue-property-decorator';
 export default class Home extends Vue {
   show = false
   visible = false
+
+  handleClick(){
+    const fpPromise = FingerprintJS.load({monitoring: false})
+    fpPromise.then(fp => fp.get())
+              .then(result => {
+                const visitorId = result.visitorId
+                console.log(visitorId)
+              })
+  }
 }
 </script>
 <style lang="scss" scoped>
