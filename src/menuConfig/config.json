@@ -46,6 +46,11 @@
         "path": "/notice",
         "title": "通知提醒",
         "module": "notice"
+      },
+      {
+        "path": "/countDown",
+        "title": "倒计时",
+        "module": "countDown"
       }
     ]
   }

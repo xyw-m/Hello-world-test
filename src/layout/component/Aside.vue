@@ -2,6 +2,8 @@
     <div class="side-container">
         <el-menu
             default-active="1"
+            :unique-opened="true"
+            :collapse-transition="false"
             router>
             <el-submenu index="1">
                 <template slot="title">
@@ -11,6 +13,21 @@
                 <el-menu-item index="/updateLog">更新日志</el-menu-item>
             </el-submenu>
             <el-submenu index="2">
+                <template slot="title">
+                    <i class="el-icon-menu"></i>
+                    <span>临时测试</span>
+                </template>
+                <el-menu-item index="/tempAjax">Ajax相关测试</el-menu-item>
+            </el-submenu>
+            <el-submenu index="3">
+                <template slot="title">
+                    <i class="el-icon-menu"></i>
+                    <span>微前端</span>
+                </template>
+                <el-menu-item index="/store-app">子应用</el-menu-item>
+                <el-menu-item index="/store-app/comm">子应用页面</el-menu-item>
+            </el-submenu>
+            <el-submenu index="4">
                 <template slot="title">
                     <i class="el-icon-menu"></i>
                     <span>组件</span>
