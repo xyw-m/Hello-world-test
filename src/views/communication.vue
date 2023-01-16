@@ -10,12 +10,12 @@
 </template>
 <script>
 import actions from '@/action.js'
-import workflow from './test.vue'
+// import workflow from './test.vue'
 export default {
   data(){
     return {
       state: null,
-      childCom: workflow
+      // childCom: workflow
     }
   },
   methods: {

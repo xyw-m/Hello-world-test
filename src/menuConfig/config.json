@@ -46,6 +46,11 @@
         "path": "/notice",
         "title": "通知提醒",
         "module": "notice"
+      },
+      {
+        "path": "/issueResolve/repeatComponents",
+        "title": "重复组件",
+        "module": "issueResolve/repeatComponents"
       }
     ]
   }
