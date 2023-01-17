@@ -6,7 +6,8 @@ module.exports = {
   'extends': [
     'plugin:vue/essential',
     'eslint:recommended',
-    '@vue/typescript/recommended'
+    '@vue/typescript/recommended',
+    'eslint-config-ali/vue'
   ],
   parserOptions: {
     ecmaVersion: 2020

@@ -5,7 +5,8 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@types/d3-zoom": "^3.0.1",
@@ -14,6 +15,7 @@
     "core-js": "^3.6.5",
     "d3-zoom": "^3.0.0",
     "element-ui": "^2.15.6",
+    "eslint-config-ali": "^14.0.2",
     "github-markdown-css": "^5.1.0",
     "html-loader": "^3.1.0",
     "markdown-it": "^12.3.2",
@@ -46,11 +48,21 @@
     "@vue/eslint-config-typescript": "^7.0.0",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.1.0",
     "node-sass": "^4.12.0",
+    "prettier": "^2.8.3",
     "sass-loader": "^8.0.2",
     "typescript": "~4.1.5",
     "vue-loader": "^15.9.7",
     "vue-markdown-loader": "^1.0.0",
     "vue-template-compiler": "^2.6.10"
+  },
+  "lint-staged": {
+    "src/**/*.{js, jsx, ts, tsx, json}": [
+      "prettier --write",
+      "eslint",
+      "git add"
+    ]
   }
 }
