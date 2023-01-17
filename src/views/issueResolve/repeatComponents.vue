@@ -16,11 +16,14 @@ import temp from '@/components/temp/index.vue'
   components: { temp }
 })
 export default class repeatComponent extends Vue {
+  /* tslint:disable */
   handleClick(){
     (this as any).$refs.temp.getResData()
   }
 
-  /* tslint:disable */
+  var temp
+
+  
   created(){
     console.log('just a test for eslint check')
   }

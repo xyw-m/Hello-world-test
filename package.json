@@ -58,8 +58,13 @@
     "vue-markdown-loader": "^1.0.0",
     "vue-template-compiler": "^2.6.10"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
   "lint-staged": {
-    "src/**/*.{js, jsx, ts, tsx, json}": [
+    "src/**/*.{js, vue, ts, tsx, json}": [
       "prettier --write",
       "eslint",
       "git add"
