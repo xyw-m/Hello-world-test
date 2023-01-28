@@ -9,23 +9,20 @@
   </div>
 </template>
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator'
-import temp from '@/components/temp/index.vue'
+import { Vue, Component } from 'vue-property-decorator';
+import temp from '@/components/temp/index.vue';
+
 @Component({
   name: 'repeatComponent',
-  components: { temp }
+  components: { temp },
 })
 export default class repeatComponent extends Vue {
-  /* tslint:disable */
-  handleClick(){
-    (this as any).$refs.temp.getResData()
+  handleClick() {
+    (this as any).$refs.temp.getResData();
   }
 
-  var temp
-
-  
-  created(){
-    console.log('just a test for eslint check')
+  created() {
+    console.log('just a test for eslint check');
   }
 }
 </script>

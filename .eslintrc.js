@@ -4,16 +4,24 @@ module.exports = {
     node: true
   },
   'extends': [
+    'eslint-config-ali/vue',
     'plugin:vue/essential',
     'eslint:recommended',
     '@vue/typescript/recommended',
-    'eslint-config-ali/vue'
   ],
   parserOptions: {
-    ecmaVersion: 2020
+    ecmaVersion: 2020,
   },
   rules: {
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off'
+  },
+  settings: {
+    'import/resolver': {
+      alias: {
+        map: [["@", "./src"]],
+        extensions: [".js", ".vue", ".ts", ".json"]
+      }
+    }
   }
 }
