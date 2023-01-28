@@ -22,6 +22,7 @@ export default class repeatComponent extends Vue {
   }
 
   created() {
+    let t;
     console.log('just a test for eslint check');
   }
 }
