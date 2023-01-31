@@ -20,11 +20,5 @@ export default class repeatComponent extends Vue {
   handleClick() {
     (this as any).$refs.temp.getResData();
   }
-
-  created() {
-    let t = 1;
-    t = '22';
-    console.log('just a test for eslint check');
-  }
 }
 </script>
