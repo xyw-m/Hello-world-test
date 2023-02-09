@@ -8,7 +8,7 @@
       <el-button>测试affix</el-button>
     </x-affix>
     <el-divider></el-divider>
-        <pre style="height: 400px; margin-left: 220px">
+    <pre style="height: 400px; margin-left: 220px">
       Element UI 贡献指南
       Hi! 首先感谢你使用 Element UI。
 
@@ -118,28 +118,29 @@
 </template>
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
-import affix from '@/components/affix.vue'
+import affix from '@/components/affix.vue';
+
 @Component({
   name: 'About',
-  components: {affix}
+  components: { affix },
 })
 export default class About extends Vue {
-  top = 10
-  bottom=20
+  top = 10;
+  bottom = 20;
 
-  placeholderRect(event:any){
-    console.log(event.target.getBoundingClientRect(), "affix")
-    const commonDOM = document.querySelector('#commonDOM')
-    commonDOM && console.log(commonDOM.getBoundingClientRect(), "commonDOM")
+  placeholderRect(event: any) {
+    console.log(event.target.getBoundingClientRect(), 'affix');
+    const commonDOM = document.querySelector('#commonDOM');
+    commonDOM && console.log(commonDOM.getBoundingClientRect(), 'commonDOM');
   }
 
-  getTarget(){
-    const target = document.getElementById('bottom')
-    return target
+  getTarget() {
+    const target = document.getElementById('bottom');
+    return target;
   }
 
-  handleScroll(event:any){
-    const target = event.target
+  handleScroll(event: any) {
+    const { target } = event;
   }
 }
 </script>

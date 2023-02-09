@@ -1,10 +1,10 @@
 export default {
-  created: function(){
-    this.hello()
+  created() {
+    this.hello();
   },
   methods: {
-    hello: function(){
-      console.log('hello from mixin!')
-    }
-  }
-}
+    hello() {
+      console.log('hello from mixin!');
+    },
+  },
+};

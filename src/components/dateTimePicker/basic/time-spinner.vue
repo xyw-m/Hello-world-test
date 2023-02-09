@@ -7,13 +7,16 @@
       class="timeSpinner-wrapper wrapper-hours"
       wrap-style="max-height: inherit;"
       view-class="timeSpinner-ul"
-      @mousemove.native="adjustCurrentSpinner('hours')">
+      @mousemove.native="adjustCurrentSpinner('hours')"
+    >
       <li
         v-for="(disabled, hour) in hoursList"
         :key="hour"
         class="timeSpinner-item"
-        :class="{'active': hour === hours, 'disabled': disabled}"
-        @click="handleClick('hours', { value: hour, disabled: disabled})">{{ ('0' + hour).slice(-2) }}
+        :class="{ active: hour === hours, disabled: disabled }"
+        @click="handleClick('hours', { value: hour, disabled: disabled })"
+      >
+        {{ ("0" + hour).slice(-2) }}
       </li>
     </el-scrollbar>
     <!-- minutes -->
@@ -23,13 +26,17 @@
       class="timeSpinner-wrapper wrapper-minutes"
       wrap-style="max-height: inherit;"
       view-class="timeSpinner-ul timeSpinner-minutes"
-      @mousemove.native="adjustCurrentSpinner('minutes')">
+      @mousemove.native="adjustCurrentSpinner('minutes')"
+    >
       <li
         v-for="(enabled, key) in minutesList"
         :key="key"
         class="timeSpinner-item"
-        :class="{ 'active': key === minutes, 'disabled': !enabled }"
-        @click="handleClick('minutes', { value: key, disabled: !enabled })">{{ ('0' + key).slice(-2) }}</li>
+        :class="{ active: key === minutes, disabled: !enabled }"
+        @click="handleClick('minutes', { value: key, disabled: !enabled })"
+      >
+        {{ ("0" + key).slice(-2) }}
+      </li>
     </el-scrollbar>
     <!-- seconds -->
     <el-scrollbar
@@ -39,145 +46,167 @@
       wrap-style="max-height: inherit;"
       view-class="timeSpinner-ul"
       v-show="showSeconds"
-      @mousemove.native="adjustCurrentSpinner('seconds')">
+      @mousemove.native="adjustCurrentSpinner('seconds')"
+    >
       <li
         v-for="(second, key) in 60"
         :key="key"
         class="timeSpinner-item"
-        :class="{ 'active': key === seconds }"
-        @click="handleClick('seconds', { value: key, disabled: false })">{{ ('0' + key).slice(-2) }}</li>
+        :class="{ active: key === seconds }"
+        @click="handleClick('seconds', { value: key, disabled: false })"
+      >
+        {{ ("0" + key).slice(-2) }}
+      </li>
     </el-scrollbar>
   </div>
 </template>
 <script>
-import { getRangeHours, getRangeMinutes, modifyTime } from '../utils/date-util'
+import { getRangeHours, getRangeMinutes, modifyTime } from '../utils/date-util';
+
 export default {
-  data(){
+  data() {
     return {
       selectableRange: [],
-      currentScrollbar: null
-    }
+      currentScrollbar: null,
+    };
   },
 
   props: {
     date: {},
     showSeconds: {
       type: Boolean,
-      default: true
-    }
+      default: true,
+    },
   },
 
   computed: {
-    hours(){
-      return this.date.getHours()
+    hours() {
+      return this.date.getHours();
     },
-    minutes(){
-      return this.date.getMinutes()
+    minutes() {
+      return this.date.getMinutes();
     },
-    seconds(){
-      return this.date.getSeconds()
+    seconds() {
+      return this.date.getSeconds();
     },
-    hoursList(){
-      return getRangeHours(this.selectableRange)
+    hoursList() {
+      return getRangeHours(this.selectableRange);
     },
-    minutesList(){
-      
-      return getRangeMinutes(this.selectableRange, this.hours)
-    }
+    minutesList() {
+      return getRangeMinutes(this.selectableRange, this.hours);
+    },
   },
 
   methods: {
-    adjustSpinners(){
-      this.adjustSpinner('hours', this.hours)
-      this.adjustSpinner('minutes', this.minutes)
-      this.adjustSpinner('seconds', this.seconds)
+    adjustSpinners() {
+      this.adjustSpinner('hours', this.hours);
+      this.adjustSpinner('minutes', this.minutes);
+      this.adjustSpinner('seconds', this.seconds);
     },
-    adjustSpinner(type, value){
-      const el = this.$refs[type].wrap
-      if(el){
-        el.scrollTop = Math.max(0, value * this.typeItemHeight(type))
+    adjustSpinner(type, value) {
+      const el = this.$refs[type].wrap;
+      if (el) {
+        el.scrollTop = Math.max(0, value * this.typeItemHeight(type));
       }
     },
-    adjustCurrentSpinner(type){
-      this.adjustSpinner(type, this[type])
+    adjustCurrentSpinner(type) {
+      this.adjustSpinner(type, this[type]);
     },
-    typeItemHeight(type){
-      return this.$refs[type].$el.querySelector('li').offsetHeight
+    typeItemHeight(type) {
+      return this.$refs[type].$el.querySelector('li').offsetHeight;
     },
-    scrollBarHeight(type){
-      return this.$refs[type].$el.offsetHeight
+    scrollBarHeight(type) {
+      return this.$refs[type].$el.offsetHeight;
     },
-    bindScrollEvent(){
+    bindScrollEvent() {
       const bindFunction = (type) => {
         this.$refs[type].wrap.onscroll = (e) => {
-          this.handleScroll(type, e)
-        }
-      }
-      bindFunction('hours')
-      bindFunction('minutes')
-      bindFunction('seconds')
+          this.handleScroll(type, e);
+        };
+      };
+      bindFunction('hours');
+      bindFunction('minutes');
+      bindFunction('seconds');
     },
-    handleScroll(type){
-      const value = Math.min(Math.round((this.$refs[type].wrap.scrollTop - (this.scrollBarHeight(type) * 0.5 - 10) / this.typeItemHeight(type) + 3) / this.typeItemHeight(type)), (type === 'hours' ? 23 : 59));
-      this.modifyDateField(type, value)
-    },   
-    handleClick(type, { value, disabled }){
-      if(!disabled){
-        this.modifyDateField(type, value)
-        this.emitSelectRange(type)
-        this.adjustSpinner(type, value)
+    handleScroll(type) {
+      const value = Math.min(
+        Math.round(
+          (this.$refs[type].wrap.scrollTop -
+            (this.scrollBarHeight(type) * 0.5 - 10) /
+              this.typeItemHeight(type) +
+            3) /
+            this.typeItemHeight(type),
+        ),
+        type === 'hours' ? 23 : 59,
+      );
+      this.modifyDateField(type, value);
+    },
+    handleClick(type, { value, disabled }) {
+      if (!disabled) {
+        this.modifyDateField(type, value);
+        this.emitSelectRange(type);
+        this.adjustSpinner(type, value);
       }
     },
-    modifyDateField(type, value){
-      switch(type){
+    modifyDateField(type, value) {
+      switch (type) {
         case 'hours':
-          this.$emit('change', modifyTime(this.date, value, this.minutes, this.seconds))
-          break
+          this.$emit(
+            'change',
+            modifyTime(this.date, value, this.minutes, this.seconds),
+          );
+          break;
         case 'minutes':
-          this.$emit('change', modifyTime(this.date, this.hours, value, this.seconds))
-          break
+          this.$emit(
+            'change',
+            modifyTime(this.date, this.hours, value, this.seconds),
+          );
+          break;
         case 'seconds':
-          this.$emit('change', modifyTime(this.date, this.hours, this.minutes, value))
-          break
+          this.$emit(
+            'change',
+            modifyTime(this.date, this.hours, this.minutes, value),
+          );
+          break;
       }
     },
-    emitSelectRange(type){
-      if(type === 'hours'){
-        this.$emit('select-range', 0, 2)
-      } else if(type === 'minutes'){
-        this.$emit('select-range', 3, 5)
-      } else if(type === 'seconds'){
-        this.$emit('select-range', 6, 8)
+    emitSelectRange(type) {
+      if (type === 'hours') {
+        this.$emit('select-range', 0, 2);
+      } else if (type === 'minutes') {
+        this.$emit('select-range', 3, 5);
+      } else if (type === 'seconds') {
+        this.$emit('select-range', 6, 8);
       }
-      this.currentScrollbar = type
-    }
+      this.currentScrollbar = type;
+    },
   },
 
-  mounted(){
+  mounted() {
     this.$nextTick(() => {
-      this.bindScrollEvent()
-    })
-  }
-}
+      this.bindScrollEvent();
+    });
+  },
+};
 </script>
 <style lang="scss" scoped>
 .time-spinner {
   width: 216px;
   border-radius: 2px;
-  border: 1px solid #E1E1E1;
+  border: 1px solid #e1e1e1;
   padding: 0 16px;
-  .timeSpinner-wrapper{
+  .timeSpinner-wrapper {
     width: 33%;
     max-height: 240px;
     display: inline-block;
     &::before {
-      content: '';
-      background-color: #E6F1FF;
+      content: "";
+      background-color: #e6f1ff;
       position: absolute;
-      border-top: 16px solid #E6F1FF;
-      border-bottom: 16px solid #E6F1FF;
-      border-left: 18px solid #E6F1FF;
-      border-right: 18px solid #E6F1FF;
+      border-top: 16px solid #e6f1ff;
+      border-bottom: 16px solid #e6f1ff;
+      border-left: 18px solid #e6f1ff;
+      border-right: 18px solid #e6f1ff;
       border-radius: 3px;
       z-index: -1;
       left: 9px;
@@ -185,10 +214,11 @@ export default {
     }
   }
 
-  .wrapper-hours, .wrapper-minutes {
+  .wrapper-hours,
+  .wrapper-minutes {
     &::after {
-      content: ':';
-      color: #0A7CFF;
+      content: ":";
+      color: #0a7cff;
       position: absolute;
       z-index: -1;
       top: 46%;
@@ -202,8 +232,9 @@ export default {
     list-style: none;
     padding-inline-start: 0;
     text-align: center;
-    &::before, &::after {
-      content: '';
+    &::before,
+    &::after {
+      content: "";
       display: block;
       width: 100%;
       height: 96px;
@@ -225,7 +256,7 @@ export default {
   }
 
   .active {
-    color: #0A7CFF;
+    color: #0a7cff;
     // background-color: #E6F1FF;
     font-weight: bold;
   }

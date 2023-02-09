@@ -6,24 +6,25 @@
 </template>
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
+
 @Component({
-  name: 'About'
+  name: 'About',
 })
 export default class updateHooks extends Vue {
   affixStyle = {
     width: '200px',
     height: '300px',
-    color: 'red'
-  }
-  flag = true
+    color: 'red',
+  };
+  flag = true;
 
-  updated(){
-    console.log('updated run')
+  updated() {
+    console.log('updated run');
   }
 
-  changeStyle(){
-    this.affixStyle.color = this.flag ? 'blue' : 'red'
-    this.flag = !this.flag
+  changeStyle() {
+    this.affixStyle.color = this.flag ? 'blue' : 'red';
+    this.flag = !this.flag;
   }
 }
 </script>

@@ -1,6 +1,6 @@
-import Picker from '../picker.vue'
-import TimePanel from '../panel/timePanel.vue'
-import TimeRangePanel from '../panel/timeRangePanel'
+import Picker from '../picker.vue';
+import TimePanel from '../panel/timePanel.vue';
+import TimeRangePanel from '../panel/timeRangePanel';
 
 export default {
   mixins: [Picker],
@@ -8,23 +8,23 @@ export default {
   name: 'timePicker',
 
   props: {
-    isRange: Boolean  // 是否范围选择
+    isRange: Boolean, // 是否范围选择
   },
 
-  data(){
+  data() {
     return {
-      type: ''
-    }
+      type: '',
+    };
   },
 
   watch: {
-    isRange(isRange){
-      // 
-    }
+    isRange(isRange) {
+      //
+    },
   },
 
-  created(){
-    this.type = this.isRange ? 'timerange' : 'time'
-    this.panel = this.isRange ? TimeRangePanel : TimePanel
-  }
-}
+  created() {
+    this.type = this.isRange ? 'timerange' : 'time';
+    this.panel = this.isRange ? TimeRangePanel : TimePanel;
+  },
+};

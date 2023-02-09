@@ -4,11 +4,16 @@
       v-for="(item, index) in dataSource"
       :key="index"
       class="list-item"
-      :class="`${type} ${size}`">
+      :class="`${type} ${size}`"
+    >
       <slot name="prefix" :item="item"></slot>
       <div class="item-content">
         <slot name="content" :item="item">
-          <span class="content-text"><a>{{ isPropertyExist(item, 'content') ? item.content : item }}</a></span>
+          <span class="content-text"
+            ><a>{{
+              isPropertyExist(item, "content") ? item.content : item
+            }}</a></span
+          >
         </slot>
       </div>
       <slot name="suffix" :item="item"></slot>
@@ -16,44 +21,51 @@
   </ul>
 </template>
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue } from 'vue-property-decorator';
+
 @Component({
-  name: 'sinotrukList'
+  name: 'sinotrukList',
 })
 export default class sinotrukList extends Vue {
-  @Prop({default:() => []}) private data !:Array<unknown>
-  @Prop({default: 'common'}) private type !:string
-  @Prop({default: 'middle'}) private size !:string
+  @Prop({ default: () => [] }) private data!: Array<unknown>;
+  @Prop({ default: 'common' }) private type!: string;
+  @Prop({ default: 'middle' }) private size!: string;
 
-  get dataSource(){
-    if(this.data.includes(null) || this.data.includes(undefined)){
-      console.log('sinotruk-list: Null or Undefined Value found in the data, Please check the data prop.')
+  get dataSource() {
+    if (this.data.includes(null) || this.data.includes(undefined)) {
+      console.log(
+        'sinotruk-list: Null or Undefined Value found in the data, Please check the data prop.',
+      );
     }
-    return this.data
+    return this.data;
   }
 
-  isPropertyExist(obj:any, property:string):boolean{
-    if(!obj){
-      return false
+  isPropertyExist(obj: any, property: string): boolean {
+    if (!obj) {
+      return false;
     }
-    if(typeof obj !== 'object' 
-        || !Object.prototype.hasOwnProperty.call(obj,property)){
-      return false
+    if (
+      typeof obj !== 'object' ||
+      !Object.prototype.hasOwnProperty.call(obj, property)
+    ) {
+      return false;
     } else {
-      if(obj[property] == null || obj[property] == undefined){
-        console.log(`sinotruk-list: Null or Undefined Value found in the Property[${property}], Please check the Property.`)
+      if (obj[property] == null || obj[property] == undefined) {
+        console.log(
+          `sinotruk-list: Null or Undefined Value found in the Property[${property}], Please check the Property.`,
+        );
       }
-      return true
+      return true;
     }
   }
 }
 </script>
 <style lang="scss" scoped>
 @mixin border {
-  border-bottom: 1px solid #E1E1E1;
+  border-bottom: 1px solid #e1e1e1;
   margin: 0 16px;
   &:first-child {
-    border-top: 1px solid #E1E1E1;
+    border-top: 1px solid #e1e1e1;
   }
 }
 .list-container {
@@ -72,7 +84,7 @@ export default class sinotrukList extends Vue {
         color: #000000;
       }
       a:hover {
-        color:#0A7CFF;
+        color: #0a7cff;
         text-decoration: underline;
       }
     }
@@ -92,11 +104,11 @@ export default class sinotrukList extends Vue {
 }
 .noBorder {
   .item-content {
-    padding:0 16px 0 32px;
+    padding: 0 16px 0 32px;
     .content-text {
-      position:relative;
+      position: relative;
       &::before {
-        content: '';
+        content: "";
         position: absolute;
         width: 4px;
         height: 4px;
@@ -106,7 +118,7 @@ export default class sinotrukList extends Vue {
         left: -16px;
       }
       &:hover::before {
-        background-color: #0A7CFF;
+        background-color: #0a7cff;
       }
     }
   }
@@ -119,12 +131,12 @@ export default class sinotrukList extends Vue {
   @include border;
   padding: 0 16px;
   &:nth-child(odd) {
-    background-color: #F8F8F8;
+    background-color: #f8f8f8;
   }
 }
 .card {
-  background-color: #F8F8F8;
-  border: 1px solid #E1E1E1;
+  background-color: #f8f8f8;
+  border: 1px solid #e1e1e1;
   border-radius: 4px;
   margin: 0 16px 8px 16px;
   padding: 0 16px;
@@ -133,11 +145,11 @@ export default class sinotrukList extends Vue {
     margin-bottom: 0;
   }
   &:hover {
-    border-color: #0A7CFF;
+    border-color: #0a7cff;
     cursor: pointer;
     .item-content {
       a {
-        color: #0A7CFF;
+        color: #0a7cff;
       }
     }
   }

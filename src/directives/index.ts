@@ -1,3 +1,4 @@
-import Vue from 'vue'
-import zoomDirective from './zoom/zoom.js'
-Vue.use(zoomDirective)
+import Vue from 'vue';
+import zoomDirective from './zoom/zoom.js';
+
+Vue.use(zoomDirective);

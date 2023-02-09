@@ -1,22 +1,26 @@
 <template>
   <div class="list-container">
     <ul class="list-items" :class="listStyle">
-      <li 
-        v-for="(item, index) in dataSource"
-        :key="index"
-        class="list-item">
-        <el-image 
-          v-if="isPropertyExist(item, 'img')" 
+      <li v-for="(item, index) in dataSource" :key="index" class="list-item">
+        <el-image
+          v-if="isPropertyExist(item, 'img')"
           class="item-img"
           :src="isPropertyExist(item.img, 'src') ? item.img.src : item.img"
           :fit="isPropertyExist(item.img, 'fit') ? item.img.fit : 'fill'"
-          :class="isPropertyExist(item.img, 'class')? item.img.class:''"
-          :lazy="isPropertyExist(item.img, 'lazy') ? item.img.lazy: false">
+          :class="isPropertyExist(item.img, 'class') ? item.img.class : ''"
+          :lazy="isPropertyExist(item.img, 'lazy') ? item.img.lazy : false"
+        >
         </el-image>
         <div class="item-content">
           <slot name="content" :item="item">
-            <h3 v-if="isPropertyExist(item, 'title') && item.title">{{ item.title }}</h3>
-            <span class="content-text"><a>{{ isPropertyExist(item, 'content') ? item.content : item }}</a></span>
+            <h3 v-if="isPropertyExist(item, 'title') && item.title">
+              {{ item.title }}
+            </h3>
+            <span class="content-text"
+              ><a>{{
+                isPropertyExist(item, "content") ? item.content : item
+              }}</a></span
+            >
           </slot>
         </div>
         <div>
@@ -28,44 +32,48 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-
-interface listItem {
-  content?: string
-  title?: string
-  img?: imgConfig | string
-}
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 interface imgConfig {
-  src: string,
-  class?: string,
-  fit?: string,
-  lazy?: boolean
+  src: string;
+  class?: string;
+  fit?: string;
+  lazy?: boolean;
+}
+
+interface listItem {
+  content?: string;
+  title?: string;
+  img?: imgConfig | string;
 }
 
 @Component({
-  name: 'list'
+  name: 'list',
 })
 export default class list extends Vue {
-  @Prop({default:() => []}) private data !: Array<listItem | unknown>
-  @Prop({ default: 'common'}) private listStyle !: string // 列表样式，可选值：noBorder | commom | zebra | card
+  @Prop({ default: () => [] }) private data!: Array<listItem | unknown>;
+  @Prop({ default: 'common' }) private listStyle!: string; // 列表样式，可选值：noBorder | commom | zebra | card
 
-  get dataSource(){
-    if(this.data.includes(null) || this.data.includes(undefined)){
-      console.log('Null or Undefined Value found in the data, Please check data prop')
+  get dataSource() {
+    if (this.data.includes(null) || this.data.includes(undefined)) {
+      console.log(
+        'Null or Undefined Value found in the data, Please check data prop',
+      );
     }
-    return this.data
+    return this.data;
   }
 
-  isPropertyExist(obj:any, property:string):boolean{
-    if(!obj){
-      return false
+  isPropertyExist(obj: any, property: string): boolean {
+    if (!obj) {
+      return false;
     }
-    if(typeof obj !== 'object' 
-        || !Object.prototype.hasOwnProperty.call(obj,property)){
-      return false
+    if (
+      typeof obj !== 'object' ||
+      !Object.prototype.hasOwnProperty.call(obj, property)
+    ) {
+      return false;
     } else {
-      return true
+      return true;
     }
   }
 }
@@ -73,8 +81,8 @@ export default class list extends Vue {
 <style lang="scss" scoped>
 .list-container {
   width: 100%;
-  background-color: #FFFFFF;
-  box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1000);
+  background-color: #ffffff;
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
   border-radius: 4px;
   padding: 5px 0;
   .list-items {
@@ -112,7 +120,7 @@ export default class list extends Vue {
           line-height: 40px;
           white-space: nowrap;
           a {
-            color:	#000000;
+            color: #000000;
           }
           a:hover {
             color: #40a9ff;
@@ -125,10 +133,10 @@ export default class list extends Vue {
 }
 .common {
   li {
-    border-bottom: 2px solid #DDDDDD;
+    border-bottom: 2px solid #dddddd;
   }
   li:first-child {
-    border-top: 2px solid #DDDDDD;
+    border-top: 2px solid #dddddd;
   }
 }
 .noBorder {
@@ -140,7 +148,7 @@ export default class list extends Vue {
     position: relative;
 
     &::before {
-      content: '';
+      content: "";
       position: absolute;
       border-radius: 50%;
       background-color: #000000;
@@ -155,10 +163,10 @@ export default class list extends Vue {
 }
 .zebra {
   li {
-    border-bottom: 1px solid #DDDDDD;
+    border-bottom: 1px solid #dddddd;
   }
   li:first-child {
-    border-top: 1px solid #DDDDDD;
+    border-top: 1px solid #dddddd;
   }
   li:nth-child(odd) {
     background-color: #f6f8f7;
@@ -167,11 +175,11 @@ export default class list extends Vue {
 .card {
   li {
     background-color: #f6f8f7;
-    border: 2px solid #DDDDDD;
+    border: 2px solid #dddddd;
     border-radius: 4px;
     margin-bottom: 5px;
   }
-    li:last-child {
+  li:last-child {
     margin-bottom: 0;
   }
   li:hover {

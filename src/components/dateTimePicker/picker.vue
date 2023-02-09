@@ -8,29 +8,36 @@
     :readonly="inputReadOnly"
     v-clickoutside="handleClose"
     v-if="!ranged"
-    @input="value => userInput = value"
+    @input="(value) => (userInput = value)"
     @focus="handleFocus"
     @change="handleChange"
     @mouseenter.native="handleMouseEnter"
-    @mouseleave.native="showClose = false">
-    <i slot="prefix" class="el-input__icon editor-icon" :class="triggerClass" style="font-size: 18px;"></i>
-    <i 
+    @mouseleave.native="showClose = false"
+  >
+    <i
+      slot="prefix"
+      class="el-input__icon editor-icon"
+      :class="triggerClass"
+      style="font-size: 18px"
+    ></i>
+    <i
       v-if="haveTrigger"
-      slot="suffix" 
-      class="el-input__icon close-icon editor-icon" 
-      style="font-size: 18px;"
-      :class="[ showClose ? 'el-icon-circle-close' : '']"
+      slot="suffix"
+      class="el-input__icon close-icon editor-icon"
+      style="font-size: 18px"
+      :class="[showClose ? 'el-icon-circle-close' : '']"
       @click="handleClickClose"
-      ></i>
+    ></i>
   </el-input>
   <div
     v-else
     ref="reference"
     class="date-range-editor"
     v-clickoutside="handleClose"
-    :class="[ disabled ? 'is-disabled' : '']"
+    :class="[disabled ? 'is-disabled' : '']"
     @mouseenter="handleMouseEnter"
-    @mouseleave="showClose = false">
+    @mouseleave="showClose = false"
+  >
     <span class="range-icon editor-icon">
       <i :class="['el-input__icon', triggerClass]"></i>
     </span>
@@ -44,7 +51,8 @@
       class="range-input"
       @focus="handleFocus"
       @input="handleStartInput"
-      @change="handleStartChange">
+      @change="handleStartChange"
+    />
     <slot name="range-separator">
       <span class="range-separator">{{ rangeSeparator }}</span>
     </slot>
@@ -58,36 +66,42 @@
       class="range-input"
       @focus="handleFocus"
       @input="handleEndInput"
-      @change="handleEndChange">
+      @change="handleEndChange"
+    />
     <span class="range-icon">
-      <i 
+      <i
         v-if="haveTrigger"
-        class="el-input__icon close-icon editor-icon" 
-        :class="[ showClose ? 'el-icon-circle-close' : '']"
+        class="el-input__icon close-icon editor-icon"
+        :class="[showClose ? 'el-icon-circle-close' : '']"
         @click="handleClickClose"
-        ></i>
+      ></i>
     </span>
   </div>
 </template>
 <script>
-import Vue from 'vue'
-import { formatDate, parseDate, isDateObject, modifyTime } from './utils/date-util'
-import Popper from 'element-ui/src/utils/vue-popper'
-import merge from 'element-ui/src/utils/merge'
-import clickoutside from 'element-ui/src/utils/clickoutside'
+import Vue from 'vue';
+import {
+  formatDate,
+  parseDate,
+  isDateObject,
+  modifyTime,
+} from './utils/date-util';
+import Popper from 'element-ui/src/utils/vue-popper';
+import merge from 'element-ui/src/utils/merge';
+import clickoutside from 'element-ui/src/utils/clickoutside';
 
 const NewPopper = {
   props: {
     appendToBody: Popper.props.appendToBody,
     offset: Popper.props.offset,
     boundariesPadding: Popper.props.boundariesPadding,
-    arrowOffset: Popper.props.arrowOffset
+    arrowOffset: Popper.props.arrowOffset,
   },
   methods: Popper.methods,
   data() {
     return merge({ visibleArrow: true }, Popper.data);
   },
-  beforeDestroy: Popper.beforeDestroy
+  beforeDestroy: Popper.beforeDestroy,
 };
 
 const HAVE_TRIGGER_TYPES = [
@@ -104,8 +118,8 @@ const HAVE_TRIGGER_TYPES = [
   'datetimerange',
   'dates',
   'datetimeselect',
-  'time-selectrange'
-]
+  'time-selectrange',
+];
 
 const DEFAULT_FORMATS = {
   date: 'yyyy-MM-dd',
@@ -119,19 +133,19 @@ const DEFAULT_FORMATS = {
   datetimerange: 'yyyy-MM-dd HH:mm:ss',
   year: 'yyyy',
   datetimeselect: 'yyyy-MM-dd HH:mm',
-  'time-selectrange': 'HH:mm'
-}
+  'time-selectrange': 'HH:mm',
+};
 
-const valueEquals = function(a, b) {
+const valueEquals = function (a, b) {
   // considers Date object and string
-  const dateEquals = function(a, b) {
-    const aIsDate = a instanceof Date;
-    const bIsDate = b instanceof Date;
+  const dateEquals = function (a1, b1) {
+    const aIsDate = a1 instanceof Date;
+    const bIsDate = b1 instanceof Date;
     if (aIsDate && bIsDate) {
-      return a.getTime() === b.getTime();
+      return a1.getTime() === b1.getTime();
     }
     if (!aIsDate && !bIsDate) {
-      return a === b;
+      return a1 === b1;
     }
     return false;
   };
@@ -150,173 +164,180 @@ const valueEquals = function(a, b) {
   return false;
 };
 
-const parseAsFormatAndType = (value, customFormat, type, rangeSeparator = '-') => {
+const parseAsFormatAndType = (
+  value,
+  customFormat,
+  type,
+  rangeSeparator = '-',
+) => {
   if (!value) return null;
-  const parser = (
-    TYPE_VALUE_RESOLVER_MAP[type] ||
-    TYPE_VALUE_RESOLVER_MAP['default']
-  ).parser;
+  const { parser } =
+    TYPE_VALUE_RESOLVER_MAP[type] || TYPE_VALUE_RESOLVER_MAP.default;
   const format = customFormat || DEFAULT_FORMATS[type];
   return parser(value, format, rangeSeparator);
 };
 
 const formatAsFormatAndType = (value, customFormat, type) => {
   if (!value) return null;
-  const formatter = (
-    TYPE_VALUE_RESOLVER_MAP[type] ||
-    TYPE_VALUE_RESOLVER_MAP['default']
-  ).formatter;
+  const { formatter } =
+    TYPE_VALUE_RESOLVER_MAP[type] || TYPE_VALUE_RESOLVER_MAP.default;
   const format = customFormat || DEFAULT_FORMATS[type];
 
   return formatter(value, format);
 };
 
 // 日期格式化
-const DATE_FORMATTER = function(value, format){
-  return formatDate(value, format)
-}
+const DATE_FORMATTER = function (value, format) {
+  return formatDate(value, format);
+};
 
 // 范围格式化
-const RANGE_FORMATTER = function(value, format){
-  if(Array.isArray(value) && value.length === 2){
-    const start = value[0]
-    const end = value[1]
+const RANGE_FORMATTER = function (value, format) {
+  if (Array.isArray(value) && value.length === 2) {
+    const start = value[0];
+    const end = value[1];
 
-    if(start && end){
-      return [DATE_FORMATTER(start, format), DATE_FORMATTER(end, format)]
+    if (start && end) {
+      return [DATE_FORMATTER(start, format), DATE_FORMATTER(end, format)];
     }
   }
-  return ''
-}
+  return '';
+};
 
 // 日期解析
-const DATE_PARSER = function(text, format){
-  return parseDate(text, format)
-}
+const DATE_PARSER = function (text, format) {
+  return parseDate(text, format);
+};
 
 // 范围解析
-const RANGE_PARSER = function(array, format, separator){
-  if(!Array.isArray(array)){
-    array = array.split(separator)
+const RANGE_PARSER = function (array, format, separator) {
+  if (!Array.isArray(array)) {
+    array = array.split(separator);
   }
 
-  if(array.length === 2){
-    const range1 = array[0]
-    const range2 = array[1]
+  if (array.length === 2) {
+    const range1 = array[0];
+    const range2 = array[1];
 
-    return [DATE_PARSER(range1, format), DATE_PARSER(range2, format)]
+    return [DATE_PARSER(range1, format), DATE_PARSER(range2, format)];
   }
-  return []
-}
+  return [];
+};
 
 const TYPE_VALUE_RESOLVER_MAP = {
   default: {
-    formatter(value){
-      if (!value) return ''
-      return '' + value
+    formatter(value) {
+      if (!value) return '';
+      return `${value}`;
     },
-    parser(text){
-      if(text === undefined || text === '') return null
-      return text
-    }
+    parser(text) {
+      if (text === undefined || text === '') return null;
+      return text;
+    },
   },
   time: {
     formatter: DATE_FORMATTER,
-    parser: DATE_PARSER
+    parser: DATE_PARSER,
   },
   timerange: {
     formatter: RANGE_FORMATTER,
-    parser: RANGE_PARSER
+    parser: RANGE_PARSER,
   },
   datetimerange: {
     formatter: RANGE_FORMATTER,
-    parser: RANGE_PARSER
+    parser: RANGE_PARSER,
   },
   date: {
     formatter: DATE_FORMATTER,
-    parser: DATE_PARSER
+    parser: DATE_PARSER,
   },
   daterange: {
     formatter: RANGE_FORMATTER,
-    parser: RANGE_PARSER
+    parser: RANGE_PARSER,
   },
   datetime: {
     formatter: DATE_FORMATTER,
-    parser: DATE_PARSER
+    parser: DATE_PARSER,
   },
   datetimeselect: {
     formatter: DATE_FORMATTER,
-    parser: DATE_PARSER
+    parser: DATE_PARSER,
   },
   'time-selectrange': {
     formatter: RANGE_FORMATTER,
-    parser: RANGE_PARSER
-  }
-}
+    parser: RANGE_PARSER,
+  },
+};
 
 export default {
-  mixins: [ NewPopper ],
+  mixins: [NewPopper],
 
   directives: {
-    clickoutside: clickoutside
+    clickoutside,
   },
 
-  data(){
+  data() {
     return {
       pickerVisible: false,
       userInput: null,
       picker: null,
-      valueOnOpen: null,  // value when picker opens, used to determine whether to emit change
-      showClose: false
-    }
+      valueOnOpen: null, // value when picker opens, used to determine whether to emit change
+      showClose: false,
+    };
   },
-  
+
   props: {
     value: {},
     format: String,
     disabled: Boolean,
     readonly: {
       type: Boolean,
-      default: false
+      default: false,
     },
     defaultValue: {},
-    defaultTime: {},  // 是否有必要？
+    defaultTime: {}, // 是否有必要？
     pickerOptions: {},
     rangeSeparator: {
-      default: '至'
+      default: '至',
     },
-    valueFormat: String
+    valueFormat: String,
   },
 
   computed: {
-    displayValue(){
-      let formattedValue = formatAsFormatAndType(this.parsedValue, this.format, this.type, this.rangeSeparator)
-      if(Array.isArray(this.userInput)){
+    displayValue() {
+      let formattedValue = formatAsFormatAndType(
+        this.parsedValue,
+        this.format,
+        this.type,
+        this.rangeSeparator,
+      );
+      if (Array.isArray(this.userInput)) {
         return [
           this.userInput[0] || (formattedValue && formattedValue[0]) || '',
           this.userInput[1] || (formattedValue && formattedValue[1]) || '',
-        ]
-      } else if(this.userInput !== null){
-        return this.userInput
-      } else if(formattedValue){
-        if(this.type === 'date'){
-          formattedValue = formattedValue.replaceAll('-', '/')
-        } else if(this.type === 'datetime' || this.type === 'datetimeselect'){
-          formattedValue = formattedValue.replaceAll('-', '/')
-          formattedValue = formattedValue.replace(' ', ' - ')
-        } else if(this.type === 'daterange'){
-          formattedValue = formattedValue.map(val => val.replaceAll('-', '/'))
+        ];
+      } else if (this.userInput !== null) {
+        return this.userInput;
+      } else if (formattedValue) {
+        if (this.type === 'date') {
+          formattedValue = formattedValue.replaceAll('-', '/');
+        } else if (this.type === 'datetime' || this.type === 'datetimeselect') {
+          formattedValue = formattedValue.replaceAll('-', '/');
+          formattedValue = formattedValue.replace(' ', ' - ');
+        } else if (this.type === 'daterange') {
+          formattedValue = formattedValue.map((val) =>
+            val.replaceAll('-', '/'));
         }
-        return formattedValue
+        return formattedValue;
       } else {
-        return ''
+        return '';
       }
-    }, 
-    reference(){
-      const reference = this.$refs.reference
-      return reference.$el || reference
     },
-    selectionMode(){
+    reference() {
+      const { reference } = this.$refs;
+      return reference.$el || reference;
+    },
+    selectionMode() {
       if (this.type === 'week') {
         return 'week';
       } else if (this.type === 'month') {
@@ -327,457 +348,542 @@ export default {
         return 'dates';
       }
 
-      return 'day'
+      return 'day';
     },
-    refInput(){
-      if(this.reference){
-        return [].slice.call(this.reference.querySelectorAll('input'))
+    refInput() {
+      if (this.reference) {
+        return [].slice.call(this.reference.querySelectorAll('input'));
       }
-      return []
+      return [];
     },
-    parsedValue(){
-      if(!this.value) return this.value
-      if(this.type === 'time-select') return this.value 
-      if(isDateObject(this.value)) return this.value
+    parsedValue() {
+      if (!this.value) return this.value;
+      if (this.type === 'time-select') return this.value;
+      if (isDateObject(this.value)) return this.value;
 
-      if(this.valueFormat){
-        return (this.value, this.parseAsFormatAndTypevalueFormat, this.type, this.rangeSeparator) || this.value;
-      } 
-
-      if(this.type === 'time'){
-        const text = this.value.split(':')
-        const hours = parseInt(text[0])
-        const minutes = parseInt(text[1])
-        const seconds = parseInt(text[2])
-        const current = new Date()
-        return new Date(current.getFullYear(), current.getMonth(), current.getDate(), hours, minutes, seconds)
+      if (this.valueFormat) {
+        return (
+          (this.value,
+          this.parseAsFormatAndTypevalueFormat,
+          this.type,
+          this.rangeSeparator) || this.value
+        );
       }
 
-      if(this.type === 'timerange'){
-        const result = []
-        if(Array.isArray(this.value)){
-          this.value.map(val => {
-            if(isDateObject(val)){
-              result.push(new Date(val))
+      if (this.type === 'time') {
+        const text = this.value.split(':');
+        const hours = parseInt(text[0]);
+        const minutes = parseInt(text[1]);
+        const seconds = parseInt(text[2]);
+        const current = new Date();
+        return new Date(
+          current.getFullYear(),
+          current.getMonth(),
+          current.getDate(),
+          hours,
+          minutes,
+          seconds,
+        );
+      }
+
+      if (this.type === 'timerange') {
+        const result = [];
+        if (Array.isArray(this.value)) {
+          this.value.forEach((val) => {
+            if (isDateObject(val)) {
+              result.push(new Date(val));
             } else {
-              const text = val.split(':')
-              const hours = parseInt(text[0])
-              const minutes = parseInt(text[1])
-              const seconds = parseInt(text[2])
-              const current = new Date()
-              result.push(new Date(current.getFullYear(), current.getMonth(), current.getDate(), hours, minutes, seconds))
+              const text = val.split(':');
+              const hours = parseInt(text[0]);
+              const minutes = parseInt(text[1]);
+              const seconds = parseInt(text[2]);
+              const current = new Date();
+              result.push(
+                new Date(
+                  current.getFullYear(),
+                  current.getMonth(),
+                  current.getDate(),
+                  hours,
+                  minutes,
+                  seconds,
+                ),
+              );
             }
-          })
+          });
         }
-        if(result[0].getTime() <= result[1].getTime()){
-          return result
+        if (result[0].getTime() <= result[1].getTime()) {
+          return result;
         } else {
-          throw new Error(`Invalid value: ${this.value}`)
+          throw new Error(`Invalid value: ${this.value}`);
         }
       }
 
-      if(this.type === 'time-selectrange'){
-        const result = []
-        if(Array.isArray(this.value)){
-          this.value.map(val => {
-            if(isDateObject(val)){
-              result.push(new Date(val))
+      if (this.type === 'time-selectrange') {
+        const result = [];
+        if (Array.isArray(this.value)) {
+          // eslint-disable-next-line array-callback-return
+          this.value.map((val) => {
+            if (isDateObject(val)) {
+              result.push(new Date(val));
             } else {
-              const text = val.split(':')
-              const hours = parseInt(text[0])
-              const minutes = parseInt(text[1])
-              const current = new Date()
-              result.push(new Date(current.getFullYear(), current.getMonth(), current.getDate(), hours, minutes, 0))
-            } 
-          })
+              const text = val.split(':');
+              const hours = parseInt(text[0]);
+              const minutes = parseInt(text[1]);
+              const current = new Date();
+              result.push(
+                new Date(
+                  current.getFullYear(),
+                  current.getMonth(),
+                  current.getDate(),
+                  hours,
+                  minutes,
+                  0,
+                ),
+              );
+            }
+          });
         }
-        if(result[0].getTime() <= result[1].getTime()){
-          return result
+        if (result[0].getTime() <= result[1].getTime()) {
+          return result;
         } else {
-          throw new Error(`Invalid value: ${this.value}`)
+          throw new Error(`Invalid value: ${this.value}`);
         }
       }
 
-      return Array.isArray(this.value) ? this.value.map(val => new Date(val)) : new Date(this.value)
+      return Array.isArray(this.value)
+        ? this.value.map((val) => new Date(val))
+        : new Date(this.value);
     },
-    triggerClass(){
-      return this.type.indexOf('time') !== -1 ? 'el-icon-time' : 'el-icon-date'
+    triggerClass() {
+      return this.type.indexOf('time') !== -1 ? 'el-icon-time' : 'el-icon-date';
     },
-    ranged(){
-      return this.type.indexOf('range') > -1 
+    ranged() {
+      return this.type.indexOf('range') > -1;
     },
-    haveTrigger(){
-      if(typeof this.showTrigger !== 'undefined'){
-        return this.showTrigger
+    haveTrigger() {
+      if (typeof this.showTrigger !== 'undefined') {
+        return this.showTrigger;
       }
-      return HAVE_TRIGGER_TYPES.indexOf(this.type) !== -1
+      return HAVE_TRIGGER_TYPES.indexOf(this.type) !== -1;
     },
-    valueIsEmpty(){
-      const val = this.value
-      if(Array.isArray(val)){
-        for(let i = 0, len = val.length; i < len; i++){
-          if(val[i]){
-            return false
+    valueIsEmpty() {
+      const val = this.value;
+      if (Array.isArray(val)) {
+        for (let i = 0, len = val.length; i < len; i++) {
+          if (val[i]) {
+            return false;
           }
         }
-      } else {
-        if(val){
-          return false
-        }
+      } else if (val) {
+        return false;
       }
-      return true
+      return true;
     },
-    inputReadOnly(){
-      return this.readonly || this.type === 'time-selectrange' || this.type === 'datetimeselect'
-    }
+    inputReadOnly() {
+      return (
+        this.readonly ||
+        this.type === 'time-selectrange' ||
+        this.type === 'datetimeselect'
+      );
+    },
   },
 
   watch: {
-    pickerVisible(val){
+    pickerVisible(val) {
       // pickerDisabled 需要吗？
-      if (this.readonly) return
-      if(val){
-        this.showPicker()
-        this.valueOnOpen = Array.isArray(this.value) ? [...this.value] : this.value
+      if (this.readonly) return;
+      if (val) {
+        this.showPicker();
+        this.valueOnOpen = Array.isArray(this.value)
+          ? [...this.value]
+          : this.value;
       } else {
-        this.hidePicker()
-        this.emitChange(this.value)
-        this.userInput = null
-        this.$emit('blur', this)
-        this.blur()
+        this.hidePicker();
+        this.emitChange(this.value);
+        this.userInput = null;
+        this.$emit('blur', this);
+        this.blur();
       }
     },
     parsedValue: {
       immediate: true,
-      handler(val){
-        if(this.picker){
-          this.picker.value = val
+      handler(val) {
+        if (this.picker) {
+          this.picker.value = val;
         }
-      }
-    }
+      },
+    },
   },
 
   methods: {
-    focus(){
-      if(!this.ranged){
-        this.$refs.reference.focus()
+    focus() {
+      if (!this.ranged) {
+        this.$refs.reference.focus();
       } else {
-        this.handleFocus()
+        this.handleFocus();
       }
     },
-    handleFocus(){
-      const type = this.type
+    handleFocus() {
+      const { type } = this;
 
-      if(HAVE_TRIGGER_TYPES.indexOf(type) !== -1 && !this.pickerVisible){
-        this.pickerVisible = true
+      if (HAVE_TRIGGER_TYPES.indexOf(type) !== -1 && !this.pickerVisible) {
+        this.pickerVisible = true;
       }
-      this.$emit('focus', this)
+      this.$emit('focus', this);
     },
-    showPicker(){
-      if(!this.picker){
-        this.mountPicker()
+    showPicker() {
+      if (!this.picker) {
+        this.mountPicker();
       }
 
-
-      this.pickerVisible = this.picker.visible = true
+      // eslint-disable-next-line no-multi-assign
+      this.pickerVisible = this.picker.visible = true;
 
       // this.updatePopper()
 
-      this.picker.value = this.parsedValue 
+      this.picker.value = this.parsedValue;
 
       this.$nextTick(() => {
-        this.picker.adjustSpinners && this.picker.adjustSpinners()
-      })
+        this.picker.adjustSpinners && this.picker.adjustSpinners();
+      });
     },
-    mountPicker(){
-      this.picker = new Vue(this.panel).$mount()
-      this.picker.defaultValue = this.defaultValue
+    mountPicker() {
+      this.picker = new Vue(this.panel).$mount();
+      this.picker.defaultValue = this.defaultValue;
       // 可以这样设置DOM元素width吗？
       this.popperElm = this.picker.$el; // 弹出层设置
-      this.picker.width = this.reference.getBoundingClientRect().width
-      this.picker.selectionMode = this.selectionMode
+      this.picker.width = this.reference.getBoundingClientRect().width;
+      this.picker.selectionMode = this.selectionMode;
       this.$watch('format', (format) => {
-        this.picker.format = format
-      })
+        this.picker.format = format;
+      });
 
       const updateOptions = () => {
-        const options = this.pickerOptions || null
+        const options = this.pickerOptions || null;
 
-        if(options && options.selectableRange && (this.type === 'time' || this.type === 'date')){
-          let ranges = options.selectableRange
-          const parser = TYPE_VALUE_RESOLVER_MAP.datetimerange.parser
-          const format =  DEFAULT_FORMATS.timerange
+        if (
+          options &&
+          options.selectableRange &&
+          (this.type === 'time' || this.type === 'date')
+        ) {
+          let ranges = options.selectableRange;
+          const { parser } = TYPE_VALUE_RESOLVER_MAP.datetimerange;
+          const format = DEFAULT_FORMATS.timerange;
 
-
-          ranges = Array.isArray(ranges) ? ranges : [ranges]
-          this.picker.selectableRange = ranges.map(range => parser(range, format, '-'))
-          if(this.type === 'date'){
-            ranges = ranges[0].split(' - ')
-            this.picker.selectableRange = ranges.map(range => {
-              let date = new Date(range)
-              const hours = ranges.indexOf(range) === 0 ? 0 : 23
-              const minutes = ranges.indexOf(range) === 0 ? 0 : 39
-              const seconds = ranges.indexOf(range) === 0 ? 0 : 59
-              return new Date(date.getFullYear(), date.getMonth(), date.getDate(), hours, minutes, seconds)
-            })
-            
+          ranges = Array.isArray(ranges) ? ranges : [ranges];
+          this.picker.selectableRange = ranges.map((range) =>
+            parser(range, format, '-'));
+          if (this.type === 'date') {
+            ranges = ranges[0].split(' - ');
+            this.picker.selectableRange = ranges.map((range) => {
+              const date = new Date(range);
+              const hours = ranges.indexOf(range) === 0 ? 0 : 23;
+              const minutes = ranges.indexOf(range) === 0 ? 0 : 39;
+              const seconds = ranges.indexOf(range) === 0 ? 0 : 59;
+              return new Date(
+                date.getFullYear(),
+                date.getMonth(),
+                date.getDate(),
+                hours,
+                minutes,
+                seconds,
+              );
+            });
           }
         }
 
-        for(const option in options){
-          if(Object.prototype.hasOwnProperty.call(options, option) && option !== 'selectableRange'){
-            this.picker[option] = options[option]
+        for (const option in options) {
+          if (
+            Object.prototype.hasOwnProperty.call(options, option) &&
+            option !== 'selectableRange'
+          ) {
+            this.picker[option] = options[option];
           }
         }
 
-        if(this.format){
-          this.picker.format = this.format
+        if (this.format) {
+          this.picker.format = this.format;
         }
-      }
+      };
 
-      updateOptions()
+      updateOptions();
 
-      this.unwatchPickerOptions = this.$watch('pickerOptions', () => updateOptions())
-      this.$el.appendChild(this.picker.$el)
+      this.unwatchPickerOptions = this.$watch('pickerOptions', () =>
+        updateOptions());
+      this.$el.appendChild(this.picker.$el);
 
       // 监听自定义事件
       // 未找到 this.doDestroy ？
       this.picker.$on('pick', (date = '', visible = false) => {
-        this.userInput = null
-        this.pickerVisible = this.picker.visible = visible
-        this.emitInput(date)
-      })
+        this.userInput = null;
+        // eslint-disable-next-line no-multi-assign
+        this.pickerVisible = this.picker.visible = visible;
+        this.emitInput(date);
+      });
 
       this.picker.$on('select-range', (start, end, pos) => {
-        if(this.refInput.length === 0) return
-        if(!pos || pos === 'min'){
-          this.refInput[0].setSelectionRange(start, end)
-          this.refInput[0].focus()
-        } else if(pos === 'max'){
-          this.refInput[1].setSelectionRange(start, end)
-          this.refInput[1].focus()
+        if (this.refInput.length === 0) return;
+        if (!pos || pos === 'min') {
+          this.refInput[0].setSelectionRange(start, end);
+          this.refInput[0].focus();
+        } else if (pos === 'max') {
+          this.refInput[1].setSelectionRange(start, end);
+          this.refInput[1].focus();
         }
-      })
+      });
     },
-    unmountPicker(){
-      if(this.picker){
-        this.picker.$destroy()
-        this.picker.$off()
-        if(typeof this.unwatchPickerOptions === 'function'){
-          this.unwatchPickerOptions()
+    unmountPicker() {
+      if (this.picker) {
+        this.picker.$destroy();
+        this.picker.$off();
+        if (typeof this.unwatchPickerOptions === 'function') {
+          this.unwatchPickerOptions();
         }
-        this.picker.$el.parentNode.removeChild(this.picker.$el)
+        this.picker.$el.parentNode.removeChild(this.picker.$el);
       }
     },
-    hidePicker(){
-      if(this.picker){
-        this.pickerVisible = this.picker.visible = false
-        this.destroyPopper()
+    hidePicker() {
+      if (this.picker) {
+        // eslint-disable-next-line no-multi-assign
+        this.pickerVisible = this.picker.visible = false;
+        this.destroyPopper();
       }
     },
-    emitInput(value){
-      let formatted = this.formatToValue(value)
-      if(!valueEquals(this.value, formatted)){
-        if(this.type === 'time-selectrange'){
-          const result = []
-          if(Array.isArray(value)){
-            value.map(val => {
-              if(typeof val === 'string'){
-                result.push(val)
+    emitInput(value) {
+      let formatted = this.formatToValue(value);
+      if (!valueEquals(this.value, formatted)) {
+        if (this.type === 'time-selectrange') {
+          const result = [];
+          if (Array.isArray(value)) {
+            value.forEach((val) => {
+              if (typeof val === 'string') {
+                result.push(val);
               } else {
-                const hours = val.getHours()
-                const minutes = val.getMinutes()
-                result.push((hours < 10 ? '0' + hours : hours) + ':' + (minutes < 10 ? '0' + minutes : minutes))
+                const hours = val.getHours();
+                const minutes = val.getMinutes();
+                result.push(
+                  `${hours < 10 ? `0${hours}` : hours}:${
+                    minutes < 10 ? `0${minutes}` : minutes
+                  }`,
+                );
               }
-            })
+            });
           }
-          formatted = result
+          formatted = result;
         }
-        this.$emit('input', formatted)
+        this.$emit('input', formatted);
       }
     },
-    emitChange(val){
+    emitChange(val) {
       // determine user real change only
-      if(!valueEquals(val, this.valueOnOpen)){
-        if(this.type === 'time-selectrange' && Array.isArray(val)){
-          val = val.map(date => {
-            if(typeof date === 'string') return date
-            const hours = date.getHours()
-            const minutes = date.getMinutes()
-            return (hours < 10 ? '0' + hours : hours) + ':' + (minutes < 10 ? '0' + minutes : minutes)
-          })
+      if (!valueEquals(val, this.valueOnOpen)) {
+        if (this.type === 'time-selectrange' && Array.isArray(val)) {
+          val = val.map((date) => {
+            if (typeof date === 'string') return date;
+            const hours = date.getHours();
+            const minutes = date.getMinutes();
+            return `${hours < 10 ? `0${hours}` : hours}:${
+              minutes < 10 ? `0${minutes}` : minutes
+            }`;
+          });
         }
-        this.$emit('change', val)
-        this.valueOnOpen = val
+        this.$emit('change', val);
+        this.valueOnOpen = val;
       }
     },
-    isValidValue(value){
-      if(!this.picker){
-        this.mountPicker()
+    isValidValue(value) {
+      if (!this.picker) {
+        this.mountPicker();
       }
-      if(this.picker.isValidValue){
-        return value && this.picker.isValidValue(value)
+      if (this.picker.isValidValue) {
+        return value && this.picker.isValidValue(value);
       } else {
-        return true
+        return true;
       }
     },
-    formatToValue(date){
-      const isFormattable = isDateObject(date) || (Array.isArray(date) && date.every(isDateObject))
-      if(this.valueFormat && isFormattable){
-        return formatAsFormatAndType(date, this.valueFormat, this.type, this.rangeSeparator)
+    formatToValue(date) {
+      const isFormattable =
+        isDateObject(date) || (Array.isArray(date) && date.every(isDateObject));
+      if (this.valueFormat && isFormattable) {
+        return formatAsFormatAndType(
+          date,
+          this.valueFormat,
+          this.type,
+          this.rangeSeparator,
+        );
       } else {
-        return date
+        return date;
       }
     },
-    formatToString(value){
-      const type = Array.isArray(value) ? this.type : this.type.replace('range', '')
-      return formatAsFormatAndType(value, this.format, type)
+    formatToString(value) {
+      const type = Array.isArray(value)
+        ? this.type
+        : this.type.replace('range', '');
+      return formatAsFormatAndType(value, this.format, type);
     },
     // deals with user input
-    parseString(value){
-      const type = Array.isArray(value) ? this.type : this.type.replace('range', '')
-      return parseAsFormatAndType(value, this.format, type)
+    parseString(value) {
+      const type = Array.isArray(value)
+        ? this.type
+        : this.type.replace('range', '');
+      return parseAsFormatAndType(value, this.format, type);
     },
-    handleFieldReset(initialValue){
-      this.userInput = initialValue === '' ? null : initialValue
+    handleFieldReset(initialValue) {
+      this.userInput = initialValue === '' ? null : initialValue;
     },
-    blur(){
-      this.refInput.forEach(input => input.blur())
+    blur() {
+      this.refInput.forEach((input) => input.blur());
     },
-    handleClose(){
-      if(!this.pickerVisible) return
-      this.pickerVisible = false
+    handleClose() {
+      if (!this.pickerVisible) return;
+      this.pickerVisible = false;
 
-      if(this.type === 'dates'){
+      if (this.type === 'dates') {
         // restore to former value
-        const oldValue = parseAsFormatAndType(this.valueOnOpen, this.valueFormat, this.type, this.rangeSeparator) || this.valueOnOpen
-        this.emitInput(oldValue)
+        const oldValue =
+          parseAsFormatAndType(
+            this.valueOnOpen,
+            this.valueFormat,
+            this.type,
+            this.rangeSeparator,
+          ) || this.valueOnOpen;
+        this.emitInput(oldValue);
       }
     },
-    handleChange(){
-      
-      if(this.userInput){
-        if(this.type === 'date'){
-          this.userInput = this.userInput.replaceAll('/', '-')
-        } else if(this.type === 'datetime'){
-          this.userInput = this.userInput.replace(' - ', ' ')
-          this.userInput = this.userInput.replaceAll('/', '-')
+    handleChange() {
+      if (this.userInput) {
+        if (this.type === 'date') {
+          this.userInput = this.userInput.replaceAll('/', '-');
+        } else if (this.type === 'datetime') {
+          this.userInput = this.userInput.replace(' - ', ' ');
+          this.userInput = this.userInput.replaceAll('/', '-');
         }
-        const value = this.parseString(this.displayValue)
-        if(value){
-          this.picker.value = value
-          if(this.isValidValue(value)){
-            this.emitInput(value)
-            this.userInput = null
+        const value = this.parseString(this.displayValue);
+        if (value) {
+          this.picker.value = value;
+          if (this.isValidValue(value)) {
+            this.emitInput(value);
+            this.userInput = null;
           }
         }
       }
 
-      if(this.userInput === ''){
-        this.emitInput(null)
-        this.emitChange(null)
-        this.userInput = null
+      if (this.userInput === '') {
+        this.emitInput(null);
+        this.emitChange(null);
+        this.userInput = null;
       }
     },
-    handleStartInput(event){
-      if(this.userInput){
-        this.userInput = [event.target.value, this.userInput[1]]
+    handleStartInput(event) {
+      if (this.userInput) {
+        this.userInput = [event.target.value, this.userInput[1]];
       } else {
-        this.userInput = [event.target.value, null]
+        this.userInput = [event.target.value, null];
       }
     },
-    handleStartChange(event){
-      if(this.type === 'daterange' && this.userInput && this.userInput[0]){
-        this.userInput[0] = this.userInput[0].replaceAll('/', '-')
+    handleStartChange(event) {
+      if (this.type === 'daterange' && this.userInput && this.userInput[0]) {
+        this.userInput[0] = this.userInput[0].replaceAll('/', '-');
       }
-      const value = this.parseString(this.userInput && this.userInput[0])
-      if(value){
-        this.userInput = [this.formatToString(value), this.displayValue[1]]
-        const newValue = [value, this.picker.value && this.picker.value[1]]
-        if(this.type === 'timerange'){
-          newValue[0] = modifyTime(this.picker.value[1], value.getHours(), value.getMinutes(), value.getSeconds())
+      const value = this.parseString(this.userInput && this.userInput[0]);
+      if (value) {
+        this.userInput = [this.formatToString(value), this.displayValue[1]];
+        const newValue = [value, this.picker.value && this.picker.value[1]];
+        if (this.type === 'timerange') {
+          newValue[0] = modifyTime(
+            this.picker.value[1],
+            value.getHours(),
+            value.getMinutes(),
+            value.getSeconds(),
+          );
         }
-        this.picker.value = newValue
-        if(this.isValidValue(newValue)){
-          this.emitInput(newValue)
-          this.userInput = null
+        this.picker.value = newValue;
+        if (this.isValidValue(newValue)) {
+          this.emitInput(newValue);
+          this.userInput = null;
         }
       }
     },
-    handleEndInput(event){
-      if(this.userInput){
-        this.userInput = [this.userInput[0], event.target.value]
+    handleEndInput(event) {
+      if (this.userInput) {
+        this.userInput = [this.userInput[0], event.target.value];
       } else {
-        this.userInput = [null, event.target.value]
+        this.userInput = [null, event.target.value];
       }
     },
-    handleEndChange(event){
-      if(this.type === 'daterange' && this.userInput && this.userInput[1]){
-        this.userInput[1] = this.userInput[1].replaceAll('/', '-')
+    handleEndChange(event) {
+      if (this.type === 'daterange' && this.userInput && this.userInput[1]) {
+        this.userInput[1] = this.userInput[1].replaceAll('/', '-');
       }
-      const value = this.parseString(this.userInput && this.userInput[1])
-      if(value){
-        this.userInput = [this.displayValue[0], this.formatToString(value)]
-        const newValue = [this.picker.value && this.picker.value[0], value]
-        if(this.type === 'timerange'){
-          newValue[1] = modifyTime(this.picker.value[0], value.getHours(), value.getMinutes(), value.getSeconds())
+      const value = this.parseString(this.userInput && this.userInput[1]);
+      if (value) {
+        this.userInput = [this.displayValue[0], this.formatToString(value)];
+        const newValue = [this.picker.value && this.picker.value[0], value];
+        if (this.type === 'timerange') {
+          newValue[1] = modifyTime(
+            this.picker.value[0],
+            value.getHours(),
+            value.getMinutes(),
+            value.getSeconds(),
+          );
         }
-        this.picker.value = newValue
-        if(this.isValidValue(newValue)){
-          this.emitInput(newValue)
-          this.userInput = null
+        this.picker.value = newValue;
+        if (this.isValidValue(newValue)) {
+          this.emitInput(newValue);
+          this.userInput = null;
         }
       }
     },
-    handleMouseEnter(){
-      if(this.readonly || this.disabled) return
-      if(!this.valueIsEmpty){
-        this.showClose = true
+    handleMouseEnter() {
+      if (this.readonly || this.disabled) return;
+      if (!this.valueIsEmpty) {
+        this.showClose = true;
       }
     },
-    handleClickClose(event){
-      if(this.readonly || this.disabled ) return
-      if(this.showClose){
-        this.valueOnOpen = this.value
-        event.stopPropagation()
-        this.emitInput(null)
-        this.emitChange(null)
-        this.showClose = false
-        if(this.picker && typeof this.picker.handleClear === 'function'){
-          this.picker.handleClear()
+    handleClickClose(event) {
+      if (this.readonly || this.disabled) return;
+      if (this.showClose) {
+        this.valueOnOpen = this.value;
+        event.stopPropagation();
+        this.emitInput(null);
+        this.emitChange(null);
+        this.showClose = false;
+        if (this.picker && typeof this.picker.handleClear === 'function') {
+          this.picker.handleClear();
         }
       } else {
-        this.pickerVisible = !this.pickerVisible
+        this.pickerVisible = !this.pickerVisible;
       }
-    }
+    },
   },
 
-  mounted(){
-    // 
+  mounted() {
+    //
   },
 
-  created(){
+  created() {
     // vue-popper
     this.popperOptions = {
       boundariesPadding: 0,
-      gpuAcceleration: false
-    }
+      gpuAcceleration: false,
+    };
 
-    this.placement = 'bottom-start'
-    this.$on('fieldReset', this.handleFieldReset)
-  }
-}
+    this.placement = 'bottom-start';
+    this.$on('fieldReset', this.handleFieldReset);
+  },
+};
 </script>
 <style lang="scss" scoped>
-.date-editor, .date-range-editor {
+.date-editor,
+.date-range-editor {
   width: 256px;
   border-radius: 3px;
   &:hover {
-    border-color: #0A7CFF;
+    border-color: #0a7cff;
   }
   ::v-deep input {
     font-size: 12px;
-    border-color: #0A7CFF;
+    border-color: #0a7cff;
   }
 }
 
@@ -788,16 +894,16 @@ export default {
 }
 
 ::v-deep .close-icon {
-  color: #C0C4CC;
+  color: #c0c4cc;
   cursor: pointer;
 }
 
 .date-range-editor {
-  border: 1px solid #DDDDDD;
+  border: 1px solid #dddddd;
   text-align: left;
 
   .range-icon {
-    color: #C0C4CC;
+    color: #c0c4cc;
     font-size: 14px;
   }
 
@@ -818,18 +924,18 @@ export default {
   }
 }
 .is-disabled {
-  background-color: #F5F7FA;
+  background-color: #f5f7fa;
   cursor: not-allowed;
   input {
-    background-color: #F5F7FA;
+    background-color: #f5f7fa;
     cursor: not-allowed;
     &::placeholder {
-      color: #C0C4CC;
+      color: #c0c4cc;
     }
   }
 
   ::v-deep .range-separator {
-    color: #C0C4CC;
+    color: #c0c4cc;
   }
 }
 </style>

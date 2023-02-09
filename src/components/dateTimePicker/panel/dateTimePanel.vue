@@ -1,8 +1,6 @@
 <template>
   <transition name="el-zoom-in-toop">
-    <div
-      v-show="visible"
-      class="dateTime-panel">
+    <div v-show="visible" class="dateTime-panel">
       <!-- date -->
       <div class="panel-item">
         <div class="header-wrapper">
@@ -15,7 +13,8 @@
         <date-spinner
           ref="dateSpinner"
           :date="date"
-          @change="handleChange"></date-spinner>
+          @change="handleChange"
+        ></date-spinner>
       </div>
       <!-- time -->
       <div class="panel-item">
@@ -30,23 +29,31 @@
           ref="timeSpinner"
           :date="date"
           :showSeconds="showSeconds"
-          @change="handleChange"></time-spinner>
+          @change="handleChange"
+        ></time-spinner>
       </div>
       <div class="panel-footer">
         <el-button size="mini" @click="handleCancel">取消</el-button>
-        <el-button size="mini" type="primary" @click="handleConfirm()">确认</el-button>
+        <el-button size="mini" type="primary" @click="handleConfirm()"
+          >确认</el-button
+        >
       </div>
     </div>
   </transition>
 </template>
 <script>
-import timeSpinner from '../basic/time-spinner.vue'
-import dateSpinner from '../basic/date-spinner.vue'
-import { clearMilliseconds,  limitTimeRange,  timeWithinRange} from '../utils/date-util.js'
+import timeSpinner from '../basic/time-spinner.vue';
+import dateSpinner from '../basic/date-spinner.vue';
+import {
+  clearMilliseconds,
+  limitTimeRange,
+  timeWithinRange,
+} from '../utils/date-util.js';
+
 export default {
   components: { dateSpinner, timeSpinner },
 
-  data(){
+  data() {
     return {
       date: new Date(),
       value: '',
@@ -54,71 +61,70 @@ export default {
       format: 'yyyy-MM-dd HH:mm:ss',
       visible: false,
       defaultValue: null,
-      selectableRange: []
-    }
+      selectableRange: [],
+    };
   },
 
   watch: {
-    visible(val){
-      if(val){
-        this.oldValue = this.value
+    visible(val) {
+      if (val) {
+        this.oldValue = this.value;
       }
     },
-    value(newVal){
+    value(newVal) {
       let date;
-      if(newVal instanceof Date){
-        date = limitTimeRange(newVal, this.selectableRange, this.format)
-      } else if(!newVal){
-        date = this.defaultValue ? new Date(this.defaultValue) : new Date()
+      if (newVal instanceof Date) {
+        date = limitTimeRange(newVal, this.selectableRange, this.format);
+      } else if (!newVal) {
+        date = this.defaultValue ? new Date(this.defaultValue) : new Date();
       }
-      this.date = date
-      if(this.visible){
-        this.$nextTick(_ => this.adjustSpinners())
+      this.date = date;
+      if (this.visible) {
+        this.$nextTick((_) => this.adjustSpinners());
       }
-    }
+    },
   },
 
   computed: {
-    showSeconds(){
-      return (this.format || '').indexOf('ss') !== -1
-    }
+    showSeconds() {
+      return (this.format || '').indexOf('ss') !== -1;
+    },
   },
 
   methods: {
-    adjustSpinners(){
-      this.$refs.dateSpinner.adjustSpinners()
-      this.$refs.timeSpinner.adjustSpinners()
+    adjustSpinners() {
+      this.$refs.dateSpinner.adjustSpinners();
+      this.$refs.timeSpinner.adjustSpinners();
     },
-    handleChange(date){
-      this.date = clearMilliseconds(date)
-      if(this.isValidValue(this.date)){
-        this.$emit('pick', this.date, true)
+    handleChange(date) {
+      this.date = clearMilliseconds(date);
+      if (this.isValidValue(this.date)) {
+        this.$emit('pick', this.date, true);
       }
     },
-    handleCancel(){
-      this.$emit('pick', this.oldValue, false)
+    handleCancel() {
+      this.$emit('pick', this.oldValue, false);
     },
-    handleConfirm(visible = false){
-      if(this.isValidValue(this.date)){
-        this.$emit('pick', this.date, visible)
+    handleConfirm(visible = false) {
+      if (this.isValidValue(this.date)) {
+        this.$emit('pick', this.date, visible);
       } else {
-        this.handleCancel()
+        this.handleCancel();
       }
     },
-    isValidValue(date){
-      return timeWithinRange(date, this.selectableRange) 
-    }
-  }
-
-}
+    isValidValue(date) {
+      return timeWithinRange(date, this.selectableRange);
+    },
+  },
+};
 </script>
 <style lang="scss" scoped>
 .dateTime-panel {
   width: 474px;
-  background: #FFFFFF;
-  box-shadow: 0px 4px 10px 0px rgba(0,0,0,0.2);
+  background: #ffffff;
+  box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.2);
   border-radius: 3px;
-  border: 1px solid #E1E1E1;
+  border: 1px solid #e1e1e1;
   padding: 16px 20px;
   margin-top: 4px;
   z-index: 20001;
@@ -130,10 +136,10 @@ export default {
 
   .panel-header {
     height: 30px;
-    background-color: #F8F8F8;
+    background-color: #f8f8f8;
     border-top-left-radius: 2px;
     border-top-right-radius: 2px;
-    border: 1px solid #E1E1E1;
+    border: 1px solid #e1e1e1;
     border-bottom: none;
     list-style: none;
     padding-inline-start: 0;
@@ -146,7 +152,7 @@ export default {
       display: inline-block;
       text-align: center;
       font-size: 12px;
-      font-family: 'MicrosoftYaHei';
+      font-family: "MicrosoftYaHei";
       color: #222222;
       line-height: 30px;
       margin-left: -1px;
@@ -164,7 +170,7 @@ export default {
 
     button {
       width: 44px;
-      padding: 7px ;
+      padding: 7px;
     }
   }
 }

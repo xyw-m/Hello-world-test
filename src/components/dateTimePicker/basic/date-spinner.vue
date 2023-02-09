@@ -7,13 +7,17 @@
       class="dateSpinner-wrapper warpper-years"
       wrap-style="max-height: inherit;"
       view-class="dateSpinner-ul"
-      @mousemove.native="adjustCurrentSpinner('years')">
+      @mousemove.native="adjustCurrentSpinner('years')"
+    >
       <li
         v-for="(disabled, index) in yearsList"
         :key="index"
         class="dateSpinner-item"
-        :class="{'active': yearsLabel[index] === years, 'disabled': disabled}"
-        @click="handleClick('years', { value: index, disabled: disabled})">{{yearsLabel[index]}}</li>
+        :class="{ active: yearsLabel[index] === years, disabled: disabled }"
+        @click="handleClick('years', { value: index, disabled: disabled })"
+      >
+        {{ yearsLabel[index] }}
+      </li>
     </el-scrollbar>
     <!-- months -->
     <el-scrollbar
@@ -22,13 +26,17 @@
       class="dateSpinner-wrapper wrapper-months"
       wrap-style="max-height: inherit;"
       view-class="dateSpinner-ul"
-      @mousemove.native="adjustCurrentSpinner('months')">
+      @mousemove.native="adjustCurrentSpinner('months')"
+    >
       <li
         v-for="(disabled, month) in monthsList"
         :key="month"
         class="dateSpinner-item"
-        :class="{'active': month === months, 'disabled': disabled}"
-        @click="handleClick('months', { value: month, disabled: disabled })">{{ ('0' + (month + 1)).slice(-2) }}</li>
+        :class="{ active: month === months, disabled: disabled }"
+        @click="handleClick('months', { value: month, disabled: disabled })"
+      >
+        {{ ("0" + (month + 1)).slice(-2) }}
+      </li>
     </el-scrollbar>
     <el-scrollbar
       tag="ul"
@@ -36,186 +44,229 @@
       class="dateSpinner-wrapper wrapper-days"
       wrap-style="max-height: inherit;"
       view-class="dateSpinner-ul"
-      @mousemove.native="adjustCurrentSpinner('days')">
+      @mousemove.native="adjustCurrentSpinner('days')"
+    >
       <li
         v-for="(disabled, day) in daysList"
         :key="day"
         class="dateSpinner-item"
-        :class="{'active': (day + 1)  === days, 'disabled': disabled}"
-        @click="handleClick('days', { value: day + 1, disabled: false })">{{ ('0' + (day + 1)).slice(-2) }}</li>
+        :class="{ active: day + 1 === days, disabled: disabled }"
+        @click="handleClick('days', { value: day + 1, disabled: false })"
+      >
+        {{ ("0" + (day + 1)).slice(-2) }}
+      </li>
     </el-scrollbar>
   </div>
 </template>
 <script>
-import { getRangeYears, getRangeMonths, getRangeDays, modifyDate } from '../utils/date-util.js'
+import {
+  getRangeYears,
+  getRangeMonths,
+  getRangeDays,
+  modifyDate,
+} from '../utils/date-util.js';
+
 export default {
-  date(){
+  date() {
     return {
       selectableRange: [],
-      yearsLabel: []
-    }
+      yearsLabel: [],
+    };
   },
 
   props: {
-    date: {}
+    date: {},
   },
 
   watch: {
     years: {
       deep: true,
-      handler(val){
-        const before = Math.abs(val - this.yearsLabel[0])
-        const after = Math.abs(val - this.yearsLabel[this.yearsLabel.length - 1])
-        if(before < 5 || after < 5){
-          this.yearsLabel = getRangeYears(this.yearsLabel, this.date, this.selectableRange).yearsLabel
+      handler(val) {
+        const before = Math.abs(val - this.yearsLabel[0]);
+        const after = Math.abs(
+          val - this.yearsLabel[this.yearsLabel.length - 1],
+        );
+        if (before < 5 || after < 5) {
+          this.yearsLabel = getRangeYears(
+            this.yearsLabel,
+            this.date,
+            this.selectableRange,
+          ).yearsLabel;
           this.$nextTick(() => {
-            this.adjustSpinner('years', this.yearsLabel.indexOf(this.years))
-          })
+            this.adjustSpinner('years', this.yearsLabel.indexOf(this.years));
+          });
         }
-      }
-    }
+      },
+    },
   },
 
   computed: {
-    years(){
-      return this.date.getFullYear()
+    years() {
+      return this.date.getFullYear();
     },
-    months(){
-      return this.date.getMonth()
+    months() {
+      return this.date.getMonth();
     },
-    days(){
-      return this.date.getDate()
+    days() {
+      return this.date.getDate();
     },
-    yearsList(){
-      return getRangeYears(this.yearsLabel, this.date, this.selectableRange).yearsList
+    yearsList() {
+      return getRangeYears(this.yearsLabel, this.date, this.selectableRange)
+        .yearsList;
     },
-    monthsList(){
-      return getRangeMonths(this.date, this.selectableRange)
+    monthsList() {
+      return getRangeMonths(this.date, this.selectableRange);
     },
-    daysList(){
-      return getRangeDays(this.date, this.selectableRange)
-    }
+    daysList() {
+      return getRangeDays(this.date, this.selectableRange);
+    },
   },
 
   methods: {
-    adjustSpinners(){
-      this.adjustSpinner('years', this.yearsLabel.indexOf(this.years))
-      this.adjustSpinner('months', this.months)
-      this.adjustSpinner('days', this.days)
+    adjustSpinners() {
+      this.adjustSpinner('years', this.yearsLabel.indexOf(this.years));
+      this.adjustSpinner('months', this.months);
+      this.adjustSpinner('days', this.days);
     },
-    adjustSpinner(type, value){
-      const el = this.$refs[type].wrap
-      if(el){
-        if(type === 'days'){
-          value--
+    adjustSpinner(type, value) {
+      const el = this.$refs[type].wrap;
+      if (el) {
+        if (type === 'days') {
+          value--;
         }
-        el.scrollTop = Math.max(0, value * this.typeItemHeight(type))
+        el.scrollTop = Math.max(0, value * this.typeItemHeight(type));
       }
     },
-    adjustCurrentSpinner(type){
-      let value = this[type]
-      if(type === 'years'){
-        value = this.yearsLabel.indexOf(this.years)
+    adjustCurrentSpinner(type) {
+      let value = this[type];
+      if (type === 'years') {
+        value = this.yearsLabel.indexOf(this.years);
       }
-      this.adjustSpinner(type, value)
+      this.adjustSpinner(type, value);
     },
-    typeItemHeight(type){
-      return this.$refs[type].$el.querySelector('li').offsetHeight
+    typeItemHeight(type) {
+      return this.$refs[type].$el.querySelector('li').offsetHeight;
     },
-    scrollBarHeight(type){
-      return this.$refs[type].$el.offsetHeight
+    scrollBarHeight(type) {
+      return this.$refs[type].$el.offsetHeight;
     },
-    bindScrollEvent(){
+    bindScrollEvent() {
       const bindFunction = (type) => {
         this.$refs[type].wrap.onscroll = (e) => {
-          this.handleScroll(type, e)
-        }
-      }
-      bindFunction('years')
-      bindFunction('months')
-      bindFunction('days')
+          this.handleScroll(type, e);
+        };
+      };
+      bindFunction('years');
+      bindFunction('months');
+      bindFunction('days');
     },
-    handleScroll(type){
-      let max
-      switch(type){
+    handleScroll(type) {
+      let max;
+      switch (type) {
         case 'years':
-          max = 10000
-          break
+          max = 10000;
+          break;
         case 'months':
-          max = 11
+          max = 11;
           break;
         case 'days':
-          max = 31
-          break
+          max = 31;
+          break;
       }
-      let value = Math.min(Math.round((this.$refs[type].wrap.scrollTop - (this.scrollBarHeight(type) * 0.5 - 10) / this.typeItemHeight(type) + 3) / this.typeItemHeight(type)), max);
-      if(type === 'days'){
-        value ++
+      let value = Math.min(
+        Math.round(
+          (this.$refs[type].wrap.scrollTop -
+            (this.scrollBarHeight(type) * 0.5 - 10) /
+              this.typeItemHeight(type) +
+            3) /
+            this.typeItemHeight(type),
+        ),
+        max,
+      );
+      if (type === 'days') {
+        value++;
       }
-      
-      this.modifyDateField(type, value)
+
+      this.modifyDateField(type, value);
     },
-    handleClick(type, { value, disabled }){
-      if(!disabled){
-        this.modifyDateField(type, value)
-        this.emitSelectRange(type)
-        this.adjustSpinner(type, value)
+    handleClick(type, { value, disabled }) {
+      if (!disabled) {
+        this.modifyDateField(type, value);
+        this.emitSelectRange(type);
+        this.adjustSpinner(type, value);
       }
     },
-    modifyDateField(type, value){
-      switch(type){
+    modifyDateField(type, value) {
+      switch (type) {
         case 'years':
-          this.$emit('change', modifyDate(this.date, this.yearsLabel[value], this.months, this.days))
-          break
+          this.$emit(
+            'change',
+            modifyDate(
+              this.date,
+              this.yearsLabel[value],
+              this.months,
+              this.days,
+            ),
+          );
+          break;
         case 'months':
-          this.$emit('change', modifyDate(this.date, this.years, value, this.days))
-          break
+          this.$emit(
+            'change',
+            modifyDate(this.date, this.years, value, this.days),
+          );
+          break;
         case 'days':
-          this.$emit('change', modifyDate(this.date, this.years, this.months, value))
+          this.$emit(
+            'change',
+            modifyDate(this.date, this.years, this.months, value),
+          );
       }
     },
-    emitSelectRange(type){
-      if(type === 'hours'){
-        this.$emit('select-range', 0, 2)
-      } else if(type === 'minutes'){
-        this.$emit('select-range', 3, 5)
-      } else if(type === 'seconds'){
-        this.$emit('select-range', 6, 8)
+    emitSelectRange(type) {
+      if (type === 'hours') {
+        this.$emit('select-range', 0, 2);
+      } else if (type === 'minutes') {
+        this.$emit('select-range', 3, 5);
+      } else if (type === 'seconds') {
+        this.$emit('select-range', 6, 8);
       }
-      this.currentScrollbar = type
-    }
+      this.currentScrollbar = type;
+    },
   },
 
-  mounted(){
+  mounted() {
     this.$nextTick(() => {
-      this.bindScrollEvent()
-      
-    })
+      this.bindScrollEvent();
+    });
   },
 
-  created(){
-    this.yearsLabel = getRangeYears([], this.date, this.selectableRange).yearsLabel
-  }
-}
+  created() {
+    this.yearsLabel = getRangeYears(
+      [],
+      this.date,
+      this.selectableRange,
+    ).yearsLabel;
+  },
+};
 </script>
 <style lang="scss" scoped>
 .date-spinner {
   width: 216px;
   border-radius: 2px;
-  border: 1px solid #E1E1E1;
+  border: 1px solid #e1e1e1;
   padding: 0 16px;
   .dateSpinner-wrapper {
     width: 33%;
     max-height: 240px;
     display: inline-block;
     &::before {
-      content: '';
-      background-color: #E6F1FF;
+      content: "";
+      background-color: #e6f1ff;
       position: absolute;
-      border-top: 16px solid #E6F1FF;
-      border-bottom: 16px solid #E6F1FF;
-      border-left: 22px solid #E6F1FF;
-      border-right: 22px solid #E6F1FF;
+      border-top: 16px solid #e6f1ff;
+      border-bottom: 16px solid #e6f1ff;
+      border-left: 22px solid #e6f1ff;
+      border-right: 22px solid #e6f1ff;
       border-radius: 3px;
       z-index: -1;
       left: 5px;
@@ -223,25 +274,27 @@ export default {
     }
   }
 
-  .warpper-years, .wrapper-months {
+  .warpper-years,
+  .wrapper-months {
     &::after {
-      content: '/';
-      color: #0A7CFF;
+      content: "/";
+      color: #0a7cff;
       position: absolute;
       z-index: -1;
       top: 46%;
       left: 55px;
       font-weight: bold;
       font-size: 10px;
-    } 
+    }
   }
 
   ::v-deep .dateSpinner-ul {
     list-style: none;
     padding-inline-start: 0;
     text-align: center;
-    &::before, &::after {
-      content: '';
+    &::before,
+    &::after {
+      content: "";
       display: block;
       width: 100%;
       height: 96px;
@@ -263,7 +316,7 @@ export default {
   }
 
   .active {
-    color: #0A7CFF;
+    color: #0a7cff;
     // background-color: #E6F1FF;
     font-weight: bold;
   }
@@ -272,6 +325,5 @@ export default {
     color: #999999;
     cursor: not-allowed;
   }
-
 }
 </style>
