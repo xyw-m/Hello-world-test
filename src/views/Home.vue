@@ -1,42 +1,50 @@
 <template>
   <div class="home">
-    <!-- <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/> -->
-    <el-button @click="handleClick">switch name</el-button>
-    <p v-for="item in dealData" :key="item.prop">
-      <span v-if="!item.hide">{{ item.prop }}</span>
-    </p>
+    <el-input v-model="music" placeholder="请输入music"></el-input>
+    <child @dance="handleDance" :music="music"></child>
+    <el-button @click="goWithEng">路由跳转-参数英文</el-button>
+    <el-button @click="goWithChi">路由跳转-参数中文</el-button>
+    <el-button @click="goWithEng(true)">子应用路由跳转-参数英文</el-button>
+    <el-button @click="goWithChi(true)">子应用路由跳转-参数英文</el-button>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
+import child from '@/components/child.vue';
 
 @Component({
   components: {
     HelloWorld,
+    child,
   },
 })
 export default class Home extends Vue {
-  tableData = [
-    { show: true, hide: false, prop: 'name' },
-    { show: false, hide: false, prop: 'gender' },
-  ];
+  music = '';
 
-  handleClick() {
-    this.tableData[0].hide = !this.tableData[0].hide;
+  handleDance() {
+    console.log('Look! grandson is dancing!');
   }
 
-  get dealData() {
-    const arr: any = [];
-    this.tableData.forEach((ele: any) => {
-      if (!ele.hide) {
-        arr.push(ele);
-      }
+  goWithEng(flag: boolean) {
+    const path = flag ? '/store-app/about' : '/updateLog';
+    this.$router.push({
+      path,
+      query: { params: 'English params' },
     });
-    console.log(arr, 'arr');
-    return arr;
+  }
+
+  goWithChi(flag: boolean) {
+    const path = flag ? '/store-app/about' : '/updateLog';
+    this.$router.push({
+      path,
+      query: {
+        params: encodeURIComponent(
+          '任务中心配置实例(超级管理员 2023-05-04 14:13:42)s'
+        ),
+      },
+    });
   }
 }
 </script>

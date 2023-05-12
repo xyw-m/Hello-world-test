@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import VueRouter, { RouteConfig } from 'vue-router';
 import Home from '../views/Home.vue';
+import updateLog from '../views/updateLog.vue';
 import Test from '../views/Test.vue';
 import customMenu from '@/menuConfig/config.json';
 import { FormItem } from 'element-ui';
@@ -31,6 +32,11 @@ const routes: Array<RouteConfig> = [
     path: '/',
     name: 'Home',
     component: Home,
+  },
+  {
+    path: '/updateLog',
+    name: 'updateLog',
+    component: updateLog,
   },
   ...sidebarMenu,
 ];

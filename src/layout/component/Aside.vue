@@ -1,6 +1,6 @@
 <template>
   <div class="side-container">
-    <el-menu default-active="1" router>
+    <el-menu default-active="1" router class="menu">
       <el-submenu index="1">
         <template slot="title">
           <i class="el-icon-menu"></i>
@@ -17,8 +17,11 @@
           v-for="(menu, index) in menuList"
           :key="index"
           :index="menu.path"
-          >{{ menu.title }}</el-menu-item
         >
+          <template #title>
+            <span>{{ menu.title }}</span>
+          </template>
+        </el-menu-item>
       </el-submenu>
     </el-menu>
   </div>
@@ -51,11 +54,15 @@ export default class Aside extends Vue {
 }
 </script>
 <style lang="scss" scoped>
-.side-container {
-  position: fixed;
-  width: 220px;
-  height: 100vh;
-  top: 0;
-  left: 0;
+// .side-container {
+//   position: fixed;
+//   width: 220px;
+//   height: 100vh;
+//   top: 0;
+//   left: 0;
+// }
+.menu {
+  width: 200px;
+  min-height: calc(100vh - 120px);
 }
 </style>
