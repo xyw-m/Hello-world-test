@@ -16,7 +16,14 @@ export function getComplexStaffData(params) {
 
 export function getSingleStaffData(params) {
   // return request.$get({
-  //   url: `${window.$env.VUE_APP_VUE_APP_BASE_DATA}/general/sys/sysUsers/simpleUserSelect`,
+  //   url: `${window.$env.VUE_APP_BASE_DATA}/general/sys/sysUsers/simpleUserSelect`,
   //   data: params
+  // })
+}
+
+export function getInfoByUserCode(data) {
+  // return request.$post({
+  //   url: `${window.$env.VUE_APP_BASE_DATA}/general/sys/sysUsers/getUserInfoByUserCode`,
+  //   data
   // })
 }

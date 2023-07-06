@@ -1,30 +1,48 @@
 <template>
-  <div class="staff-select" :id="id">
+  <div class="staff-select" :id="id" v-popover:popover>
     <!-- 复杂模式 -->
     <div v-if="type == 'complex'">
       <el-select
         v-model="echoValue"
-        v-popover:popover
-        popper-class="staff-popper"
-        :popper-append-to-body="false"
+        :popper-class="panelVisible ? 'staff-popper' : ''"
+        :popper-append-to-body="true"
         :value-key="staffProps.key"
+        :remote-method="getStaffData"
+        :disabled="disabled"
+        :loading="loading"
+        remote
+        filterable
         @remove-tag="handleRemove"
+        @change="updateSelected"
+        @visible-change="handleVisibleChange"
         collapse-tags
         multiple
-        :disabled="disabled"
       >
         <el-option
-          v-for="op in echoValue"
+          v-for="op in complexOptions"
           :key="op[staffProps.key]"
           :label="op[staffProps.label]"
           :value="op"
-        ></el-option>
+        >
+          {{
+            `${op[staffProps.label]}（${op[staffProps["sub-label"]]}） ${op[
+              staffProps.content
+            ]
+              .split("/")
+              .pop()}`
+          }}
+        </el-option>
       </el-select>
+      <i
+        class="el-icon-search show-panel"
+        @click="panelVisible = true"
+        v-show="!disabled"
+      ></i>
       <el-popover
         ref="popover"
         :disabled="disabled"
         popper-class="staff-select-popover"
-        trigger="click"
+        trigger="manual"
         v-model="panelVisible"
         placement="bottom-start"
         :width="panelWidth"
@@ -42,6 +60,7 @@
           @update="handleUpdateEcho"
           @confirm="handleConfirm"
           @cancel="handleCancel"
+          v-clickoutside="handleHide"
         ></staff-panel>
       </el-popover>
     </div>
@@ -58,11 +77,14 @@
       clearable
       collapse-tags
       :disabled="disabled"
+      :loading="loading"
+      :value-key="staffProps['sub-label']"
+      :label-key="staffProps.label"
     >
       <el-option
         v-for="staff in staffData"
-        :key="staff[staffProps.key]"
-        :value="staff[staffProps.key]"
+        :key="staff[staffProps['sub-label']]"
+        :value="staff"
         :label="staff[staffProps.label]"
         :title="staff[staffProps.content]"
       >
@@ -79,10 +101,12 @@
 <script>
 import { getTreeData, getSingleStaffData } from './api';
 import staffPanel from './components/staff-panel.vue';
+import Clickoutside from 'element-ui/src/utils/clickoutside';
 // import staffData from '../../../src/tempData/staffData.json'
 export default {
   name: 'staffSelect',
   components: { staffPanel },
+  directives: { Clickoutside },
   props: {
     value: {
       type: [Array, String],
@@ -90,7 +114,7 @@ export default {
     },
     orgCode: {
       type: String,
-      default: '',
+      default: '0',
     },
     type: {
       type: String,
@@ -157,11 +181,12 @@ export default {
       panelVisible: false,
       treeData: [],
       staffData: [],
+      queryStaffData: [],
       filterText: '',
       defaultStaffProps: {
         label: 'userName',
         'sub-label': 'employeeNo',
-        key: 'userId',
+        key: 'employeeNo',
         content: 'orgPathStr',
       },
       defaultTreeProps: {
@@ -169,18 +194,21 @@ export default {
         label: 'orgName',
         'node-key': 'orgCode',
       },
+      loading: false,
+      singleLoaded: false,
     };
   },
   watch: {
     value: {
       deep: true,
       immediate: true,
-      handler(newValue) {
+      async handler(newValue) {
         if (this.type === 'complex') {
-          this.$nextTick(() => {
-            this.$refs.panel && this.$refs.panel.updateSelected(newValue);
-          });
+          this.updateSelected(newValue);
         } else {
+          if (!this.singleLoaded) {
+            await this.getStaffData('');
+          }
           this.$nextTick(() => {
             this.handleUpdateEcho(newValue);
             this.updateSingle(newValue);
@@ -205,13 +233,26 @@ export default {
         ...this.treeConfig,
       };
     },
+    complexOptions() {
+      const array = [];
+      this.echoValue.forEach((ele) => {
+        const index = this.queryStaffData.findIndex(
+          (staff) => ele[this.staffProps.key] === staff[this.staffProps.key]
+        );
+        if (index === -1) {
+          array.push(ele);
+        }
+      });
+      const res = [].concat(array, this.queryStaffData);
+      return res;
+    },
   },
   methods: {
     init() {
       if (this.type === 'complex') {
         this.getOrgData();
       } else {
-        this.getStaffData('');
+        // this.getStaffData('')
       }
     },
     getOrgData() {
@@ -228,13 +269,16 @@ export default {
       });
     },
     handleHide() {
-      this.$refs.panel && this.$refs.panel.cancel();
+      this.handleCancel();
     },
     handleUpdateEcho(value) {
       this.echoValue = value;
     },
     handleConfirm(selected) {
       this.$emit('change', selected);
+      if (this.type === 'complex') {
+        this.setRecentSelected(selected);
+      }
       this.panelVisible = false;
     },
     handleCancel() {
@@ -243,7 +287,16 @@ export default {
     handleRemove(value) {
       this.$refs.panel && this.$refs.panel.remove(value, true);
     },
-    getStaffData(query) {
+    handleVisibleChange(visible) {
+      if (!visible) {
+        this.queryStaffData = [];
+      }
+    },
+    async getStaffData(query) {
+      if (query === '' && this.type === 'complex') {
+        this.queryStaffData = [];
+        return;
+      }
       const search =
         typeof this.staffCustomSearch === 'string' &&
         this.staffCustomSearch !== ''
@@ -257,9 +310,15 @@ export default {
         typeof this.staffQueryFunc === 'function'
           ? this.staffQueryFunc
           : getSingleStaffData;
-      queryMethods(params).then((res) => {
+      this.loading = true;
+      const res = await queryMethods(params);
+      if (this.type === 'complex') {
+        this.queryStaffData = res.data;
+      } else {
         this.staffData = res.data;
-      });
+      }
+      this.loading = false;
+      this.singleLoaded = true;
     },
     isEqualArray(arr1, arr2) {
       if (arr1.length !== arr2.length) return false;
@@ -269,7 +328,37 @@ export default {
       if (this.multiple) {
         !this.isEqualArray(this.value, newValue) &&
           this.handleConfirm(newValue);
-      } else if (this.value !== newValue) this.handleConfirm(newValue);
+      } else if (this.value !== newValue) {
+        this.handleConfirm(newValue);
+      }
+    },
+    updateSelected(newValue) {
+      this.$nextTick(() => {
+        this.$refs.panel && this.$refs.panel.updateSelected(newValue);
+      });
+    },
+    setRecentSelected(selected) {
+      if (!Array.isArray(selected)) return;
+      const oldSelected =
+        JSON.parse(localStorage.getItem('recentSelected')) || [];
+      let res = [];
+      if (selected.length > 10) {
+        res = selected.slice(selected.length - 10);
+      } else {
+        // 从 oldSelect 删除 newSelect 中存在的值
+        selected.forEach((staff) => {
+          const index = oldSelected.findIndex(
+            (old) => old[this.staffProps.key] === staff[this.staffProps.key]
+          );
+          if (index > -1) {
+            oldSelected.splice(index, 1);
+          }
+        });
+        // oldSelect 与 newSelect合并，取后10位
+        const combine = [].concat(oldSelected, selected);
+        res = combine.slice(combine.length - 10);
+      }
+      localStorage.setItem('recentSelected', JSON.stringify(res));
     },
   },
   mounted() {
@@ -285,6 +374,18 @@ body .staff-select-popover {
   padding: 0;
 }
 .staff-select {
+  position: relative;
+  .show-panel {
+    position: absolute;
+    right: 10px;
+    top: 7px;
+    cursor: pointer;
+    color: #c0c4cc;
+    z-index: 1;
+    &:hover {
+      color: #0088ff;
+    }
+  }
   .staff-popper {
     display: none;
   }

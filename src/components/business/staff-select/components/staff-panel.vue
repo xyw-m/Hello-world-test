@@ -1,12 +1,12 @@
 <template>
-  <div class="staff-panel">
+  <div class="staff-panel" :id="id">
     <div class="header">
       <p>{{ title }}</p>
     </div>
     <div class="content">
       <!-- 组织树 -->
       <div class="left">
-        <org-tree v-bind="$attrs" @click="orgClick"></org-tree>
+        <org-tree ref="orgTree" v-bind="$attrs" @click="orgClick"></org-tree>
       </div>
       <!-- 人员选项 -->
       <div class="middle">
@@ -16,11 +16,13 @@
           :staffs="staffData"
           :selected="selected"
           :config="staffConfig"
-          :orgId="currentOrgId"
+          :orgId="currentOrgCode"
           :loading="loading"
           @search="search"
           @select="select"
           @remove="remove"
+          @set-current="setCurrent"
+          @clear-current="clearCurrent"
           @selectAll="selectAll"
           @removeAll="removeAll"
         ></staff-options>
@@ -43,7 +45,8 @@
 import orgTree from './org-tree.vue';
 import staffOptions from './staff-options.vue';
 import staffSelected from './staff-selected.vue';
-import { getComplexStaffData } from '../api';
+import { getComplexStaffData, getInfoByUserCode } from '../api';
+import { recursionExpand } from '../utils';
 
 export default {
   name: 'staffPanel',
@@ -59,8 +62,11 @@ export default {
       staffData: [],
       selected: [],
       oldSelected: [],
-      currentOrgId: '',
+      currentOrgCode: '',
       loading: false,
+      id: `panel-${new Date().getTime()}${Math.floor(
+        Math.random() * Math.pow(10, 4)
+      )}`, // 生成随机16位数id
     };
   },
   watch: {
@@ -73,12 +79,46 @@ export default {
   },
   methods: {
     orgClick(data) {
-      this.currentOrgId = data.orgId;
+      this.currentOrgCode = data.orgCode;
       const params = {
-        orgId: data.orgId,
+        orgCode: data.orgCode,
       };
-      this.$refs.options && this.$refs.options.resetForm();
+      if (this.$refs.options) {
+        this.$refs.options.resetForm();
+        this.$refs.options.updateTab(data.orgCode);
+      }
       this.getStaffData(params);
+    },
+    setCurrent({ orgCode }) {
+      // 选中并展开节点
+      const { tree } = this.$refs.orgTree;
+      if (tree) {
+        tree.setCurrentKey(orgCode); // 不会触发click事件
+        const { nodesMap } = tree.store;
+        const node = nodesMap[orgCode];
+        // 递归展开本身以及上级
+        recursionExpand(node);
+        this.$nextTick(() => {
+          const current = document.querySelector(
+            `#${this.id} .el-tree-node.is-current`
+          );
+          setTimeout(() => {
+            current &&
+              current.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center',
+                inline: 'nearest',
+              });
+          }, 100);
+          this.orgClick({ orgCode });
+        });
+      }
+    },
+    clearCurrent() {
+      const { tree } = this.$refs.orgTree;
+      tree && tree.setCurrentKey();
+      this.staffData = [];
+      this.currentOrgCode = '';
     },
     select(staff) {
       if (this.multiple) {
@@ -89,7 +129,7 @@ export default {
     },
     search(value) {
       const params = {
-        orgId: this.currentOrgId,
+        orgCode: this.currentOrgCode,
         userName: value,
       };
       this.getStaffData(params);
@@ -140,12 +180,27 @@ export default {
     },
     cancel() {
       this.selected = this.oldSelected;
+      console.log(this.oldSelected, 'oldSelected');
       this.$emit('cancel');
     },
     updateSelected(newValue) {
       if (!this.isEqual(this.selected, newValue)) {
-        this.selected = newValue;
-        this.confirm();
+        const index = newValue.findIndex(
+          (staff) => !staff[this.staffConfig.content]
+        );
+        if (index > -1) {
+          // 反显值中没有部门信息
+          const codeArray = newValue.map(
+            (staff) => staff[this.staffConfig.key]
+          );
+          getInfoByUserCode(codeArray).then((res) => {
+            this.selected = res.data;
+            this.confirm();
+          });
+        } else {
+          this.selected = newValue;
+          this.confirm();
+        }
       }
     },
     isEqual(arr1, arr2) {

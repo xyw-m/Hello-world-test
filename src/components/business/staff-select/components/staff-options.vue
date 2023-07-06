@@ -1,5 +1,18 @@
 <template>
   <div class="staff-options">
+    <el-tabs v-model="activeTab" @tab-click="handleSwitch" class="menu">
+      <el-tab-pane label="最近" name="RECENT" class="menu-item"></el-tab-pane>
+      <el-tab-pane
+        label="同部门"
+        name="DEPARTMENT"
+        class="menu-item"
+      ></el-tab-pane>
+      <el-tab-pane
+        label="组织结构"
+        name="ORGANIZATION"
+        class="menu-item"
+      ></el-tab-pane>
+    </el-tabs>
     <div class="search-form">
       <el-input
         placeholder="请输入姓名/工号/手机号"
@@ -72,6 +85,7 @@
           v-for="staff in filterStaff"
           :key="staff[config.key]"
           class="card"
+          @dblclick.native="handleSelect(staff)"
         >
           <div class="main">
             <span>
@@ -112,8 +126,11 @@
 </template>
 
 <script>
+import ElTabs from 'element-ui/packages/tabs/index';
+
 export default {
   name: 'staffOptions',
+  components: { ElTabs },
   props: {
     'staff-custom-search': Array,
     staffs: Array,
@@ -130,6 +147,7 @@ export default {
       // }
       // allChecked: false
       filterText: '',
+      activeTab: 'RECENT',
     };
   },
   // created() {
@@ -154,10 +172,14 @@ export default {
     //     : this.staffCustomSearch
     // },
     filterStaff() {
-      const staffs = this.staffs.map((staff) => {
+      let options = this.staffs;
+      if (this.activeTab === 'RECENT') {
+        options = JSON.parse(localStorage.getItem('recentSelected')) || [];
+      }
+      const staffs = options.map((staff) => {
         const selected =
           this.selected.findIndex(
-            (selectedItem) => selectedItem.userId === staff.userId
+            (_selected) => _selected.userId === staff.userId
           ) > -1;
         return {
           ...staff,
@@ -186,6 +208,11 @@ export default {
         new Set([...selectedKeys, ...staffKeys]).size;
       return isIndeterminate;
     },
+  },
+  mounted() {
+    // this.$nextTick(() => {
+    //   this.setTabStyle()
+    // })
   },
   methods: {
     /* 自定义表单项 */
@@ -216,6 +243,16 @@ export default {
     handleSearch() {
       this.$emit('search', this.form);
     },
+    handleSwitch() {
+      if (this.activeTab === 'DEPARTMENT') {
+        const orgCode =
+          JSON.parse(sessionStorage.getItem('userInfo')).orgCode ||
+          '3820001000';
+        this.$emit('set-current', { orgCode });
+      } else {
+        this.$emit('clear-current');
+      }
+    },
     defaultFilterFunc(value, staff, prop) {
       return staff[prop].indexOf(value) > -1;
     },
@@ -229,6 +266,19 @@ export default {
       // search && this.$emit('search', this.form)
       this.filterText = '';
     },
+    updateTab(orgCode) {
+      const userOrgCode =
+        JSON.parse(sessionStorage.getItem('userInfo')).orgCode || '3820001000';
+      this.activeTab = orgCode === userOrgCode ? 'DEPARTMENT' : 'ORGANIZATION';
+    },
+    setTabStyle() {
+      const bar = document.querySelector(
+        `#${this.$parent.id} .el-tabs__active-bar `
+      );
+      if (bar) {
+        bar.style.width = '32px';
+      }
+    },
   },
 };
 </script>
@@ -238,6 +288,18 @@ export default {
   width: 100%;
   height: 100%;
   // padding: 16px 20px;
+  .menu ::v-deep {
+    .el-tabs__header {
+      margin: 0;
+    }
+    .el-tabs__nav-scroll {
+      padding-left: 20px;
+    }
+    .el-tabs__item {
+      font-size: 16px;
+      margin: 5px 0;
+    }
+  }
   .search-form {
     padding: 16px 20px 0 20px;
     margin-bottom: 14px;
@@ -280,6 +342,7 @@ export default {
   }
   .option {
     width: 315px;
+    position: relative;
     .all-checked {
       padding: 0 20px;
       margin-bottom: 11px;
@@ -354,7 +417,7 @@ export default {
     }
   }
   .empty {
-    height: 340px;
+    height: 300px;
     text-align: center;
     line-height: 24px;
     color: #999999;
@@ -366,7 +429,7 @@ export default {
 <style lang="scss">
 .staff-options {
   .option-wrap {
-    height: 340px;
+    height: 300px;
     padding: 0 9px 0 20px;
     .option-view {
       padding-right: 10px;

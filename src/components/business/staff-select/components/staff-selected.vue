@@ -32,6 +32,7 @@
             closable
             :disable-transitions="true"
             @close="handleRemove(item)"
+            @dblclick.native="handleRemove(item)"
             >{{ item[config.label] }}</el-tag
           >
         </el-tooltip>
@@ -110,6 +111,7 @@ export default {
       color: #0088ff;
       padding: 2px 10px;
       margin-bottom: 10px;
+      cursor: default;
       &:nth-child(odd) {
         margin-right: 10px;
       }

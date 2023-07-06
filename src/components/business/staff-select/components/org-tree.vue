@@ -19,6 +19,7 @@
         :highlight-current="true"
         :filter-node-method="filterNode"
         :default-expanded-keys="defaultExpandedKeys"
+        :expand-on-click-node="true"
         @node-click="nodeClick"
       ></el-tree>
     </el-scrollbar>
@@ -43,10 +44,13 @@ export default {
       const key = this.treeConfig['node-key'];
       return [this.data[0][key]];
     },
+    tree() {
+      return this.$refs.tree || undefined;
+    },
   },
   watch: {
     filterText(value) {
-      this.$refs.tree.filter(value);
+      this.tree && this.tree.filter(value);
     },
   },
   methods: {
