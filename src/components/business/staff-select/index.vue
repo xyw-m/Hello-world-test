@@ -173,9 +173,10 @@ export default {
   },
   data() {
     return {
-      id: `staff-${new Date().getTime()}${Math.floor(
-        Math.random() * Math.pow(10, 4)
-      )}`, // 生成随机16位数id
+      id:
+        `staff-${ 
+          new Date().getTime() 
+        }${Math.floor(Math.random() * Math.pow(10, 4))}`, // 生成随机16位数id
       echoValue: [], // el-select 多选时 v-model绑定值
       panelWidth: 864,
       panelVisible: false,
@@ -269,7 +270,10 @@ export default {
       });
     },
     handleHide() {
-      this.handleCancel();
+      if (this.panelVisible) {
+        this.$refs.panel && this.$refs.panel.cancel();
+        this.handleCancel();
+      }
     },
     handleUpdateEcho(value) {
       this.echoValue = value;
@@ -279,10 +283,11 @@ export default {
       if (this.type === 'complex') {
         this.setRecentSelected(selected);
       }
-      this.panelVisible = false;
+      this.handleCancel();
     },
     handleCancel() {
       this.panelVisible = false;
+      this.$refs.panel && this.$refs.panel.resetTab();
     },
     handleRemove(value) {
       this.$refs.panel && this.$refs.panel.remove(value, true);
@@ -328,9 +333,7 @@ export default {
       if (this.multiple) {
         !this.isEqualArray(this.value, newValue) &&
           this.handleConfirm(newValue);
-      } else if (this.value !== newValue) {
-        this.handleConfirm(newValue);
-      }
+      } else if (this.value !== newValue) this.handleConfirm(newValue);
     },
     updateSelected(newValue) {
       this.$nextTick(() => {
@@ -354,9 +357,9 @@ export default {
             oldSelected.splice(index, 1);
           }
         });
-        // oldSelect 与 newSelect合并，取后10位
-        const combine = [].concat(oldSelected, selected);
-        res = combine.slice(combine.length - 10);
+        // oldSelect 与 newSelect合并，取前10位
+        const combine = [].concat(selected, oldSelected);
+        res = combine.slice(0, 10);
       }
       localStorage.setItem('recentSelected', JSON.stringify(res));
     },

@@ -127,9 +127,9 @@ export default {
         this.selected = [staff];
       }
     },
-    search(value) {
+    search(value, orgCode) {
       const params = {
-        orgCode: this.currentOrgCode,
+        orgCode: orgCode || this.currentOrgCode,
         userName: value,
       };
       this.getStaffData(params);
@@ -175,12 +175,12 @@ export default {
       this.selected = selected.concat(this.selected);
     },
     confirm() {
-      this.oldSelected = [].concat(this.selected);
-      this.$emit('confirm', this.selected);
+      this.oldSelected = JSON.parse(JSON.stringify(this.selected));
+      const selected = JSON.parse(JSON.stringify(this.selected));
+      this.$emit('confirm', selected);
     },
     cancel() {
-      this.selected = this.oldSelected;
-      console.log(this.oldSelected, 'oldSelected');
+      this.selected = JSON.parse(JSON.stringify(this.oldSelected));
       this.$emit('cancel');
     },
     updateSelected(newValue) {
@@ -210,6 +210,14 @@ export default {
       const arr1Keys = arr1.map((item) => item[key]);
       const arr2Keys = arr2.map((item) => item[key]);
       return arr1Keys.every((_key) => arr2Keys.includes(_key));
+    },
+    resetTab() {
+      setTimeout(() => {
+        this.clearCurrent();
+        if (this.$refs.options) {
+          this.$refs.options.activeTab = 'RECENT';
+        }
+      }, 200);
     },
   },
 };

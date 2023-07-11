@@ -161,7 +161,13 @@ export default {
     //   }
     // },
     filterText(value) {
-      this.$emit('search', value);
+      if (this.activeTab !== 'RECENT') {
+        const currentCode =
+          JSON.parse(sessionStorage.getItem('userInfo')).orgCode ||
+          '3820001000';
+        const orgCode = this.activeTab === 'DEPARTMENT' ? currentCode : '';
+        this.$emit('search', value, orgCode);
+      }
     },
   },
   computed: {
@@ -175,11 +181,19 @@ export default {
       let options = this.staffs;
       if (this.activeTab === 'RECENT') {
         options = JSON.parse(localStorage.getItem('recentSelected')) || [];
+        if (this.filterText) {
+          options = options.filter((staff) => {
+            return (
+              staff[this.config.key].includes(this.filterText) ||
+              staff[this.config.label].includes(this.filterText)
+            );
+          });
+        }
       }
       const staffs = options.map((staff) => {
         const selected =
           this.selected.findIndex(
-            (_selected) => _selected.userId === staff.userId
+            (_selected) => _selected[this.config.key] === staff[this.config.key]
           ) > -1;
         return {
           ...staff,
@@ -210,9 +224,9 @@ export default {
     },
   },
   mounted() {
-    // this.$nextTick(() => {
-    //   this.setTabStyle()
-    // })
+    this.$nextTick(() => {
+      this.setTabStyle();
+    });
   },
   methods: {
     /* 自定义表单项 */
