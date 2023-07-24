@@ -173,10 +173,9 @@ export default {
   },
   data() {
     return {
-      id:
-        `staff-${ 
-          new Date().getTime() 
-        }${Math.floor(Math.random() * Math.pow(10, 4))}`, // 生成随机16位数id
+      id: `staff-${new Date().getTime()}${Math.floor(
+        Math.random() * Math.pow(10, 4)
+      )}`, // 生成随机16位数id
       echoValue: [], // el-select 多选时 v-model绑定值
       panelWidth: 864,
       panelVisible: false,

@@ -164,7 +164,7 @@ export default {
       if (this.activeTab !== 'RECENT') {
         const currentCode =
           JSON.parse(sessionStorage.getItem('userInfo')).orgCode ||
-          '3820001000';
+          '1000000000';
         const orgCode = this.activeTab === 'DEPARTMENT' ? currentCode : '';
         this.$emit('search', value, orgCode);
       }
@@ -261,7 +261,7 @@ export default {
       if (this.activeTab === 'DEPARTMENT') {
         const orgCode =
           JSON.parse(sessionStorage.getItem('userInfo')).orgCode ||
-          '3820001000';
+          '1000000000';
         this.$emit('set-current', { orgCode });
       } else {
         this.$emit('clear-current');
@@ -270,7 +270,7 @@ export default {
     defaultFilterFunc(value, staff, prop) {
       return staff[prop].indexOf(value) > -1;
     },
-    resetForm(search = false) {
+    resetForm() {
       // const props = Object.getOwnPropertyNames(this.form)
       // props.forEach(prop => {
       //   if (typeof this.form[prop] !== 'object') {
@@ -282,7 +282,7 @@ export default {
     },
     updateTab(orgCode) {
       const userOrgCode =
-        JSON.parse(sessionStorage.getItem('userInfo')).orgCode || '3820001000';
+        JSON.parse(sessionStorage.getItem('userInfo')).orgCode || '1000000000';
       this.activeTab = orgCode === userOrgCode ? 'DEPARTMENT' : 'ORGANIZATION';
     },
     setTabStyle() {
@@ -424,9 +424,9 @@ export default {
         font-size: 12px;
         line-height: 16px;
         color: #222222;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        // white-space: nowrap;
+        // overflow: hidden;
+        // text-overflow: ellipsis;
       }
     }
   }
