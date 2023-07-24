@@ -2,26 +2,30 @@
   <div class="dict-container" :id="id">
     <div class="header">
       <p>{{ title }}</p>
+      <span class="show-operation">
+        <i
+          class="dms-icon-bianji"
+          @click="handleOperation"
+          v-show="allDisabled && !disabled"
+        ></i>
+      </span>
       <el-button
-        type="primary"
+        type="text"
         size="mini"
-        class="func-btn edit"
-        v-show="allDisabled && !disabled"
-        @click="allDisabled = false"
-        round
+        v-show="!allDisabled && allowAdd"
+        @click="appendItem"
+        >新增</el-button
       >
-        <i class="el-icon-edit" style="margin-right: 3px" />编辑
-      </el-button>
       <el-button
-        type="primary"
-        v-show="!allDisabled && !disabled"
-        class="func-btn save"
-        @click="save"
+        type="text"
         size="mini"
-        round
+        v-show="!allDisabled"
+        @click="removeAll"
+        >清空</el-button
       >
-        <i class="el-icon-document-checked" style="margin-right: 3px" />保存
-      </el-button>
+      <el-button type="text" size="mini" v-show="!allDisabled" @click="save"
+        >完成</el-button
+      >
       <span class="dropdown">
         <i
           class="el-icon-arrow-down"
@@ -30,7 +34,13 @@
         ></i>
       </span>
     </div>
-    <div class="content" v-show="visible">
+    <div
+      class="content"
+      v-show="visible"
+      :style="{
+        justifyContent: selectedList.length === 0 ? 'center' : 'flex-start',
+      }"
+    >
       <div
         class="select"
         :id="'select' + index"
@@ -38,81 +48,113 @@
         :key="index"
       >
         <!-- 一级选择器 单选 -->
-        <el-select
-          v-model="item[valueProps.firstLevel]"
-          :placeholder="placeholder"
-          :value-key="dictProps.value"
-          :disabled="allDisabled || disabledSelect[0] || disabled"
-          class="first-level"
-          :class="{ 'hide-border': level !== 1 }"
-          @change="handleChange($event, index, valueProps.firstLevel)"
-          @clear="handleClear(index)"
-          filterable
-          clearable
-        >
-          <el-option
-            v-for="op in data"
-            :key="op[dictProps.value]"
-            :label="op[dictProps.label]"
-            :value="op"
-            :disabled="noRepeat && disabledFirst(op)"
-          ></el-option>
-        </el-select>
-        <!-- 二级选择器 多选 -->
-        <el-select
+        <div class="first-level" :style="{ background: primaryColor }">
+          <el-select
+            v-model="item[valueProps.firstLevel]"
+            :placeholder="placeholder"
+            :value-key="dictProps.value"
+            :disabled="isDisabled(0)"
+            @change="handleChange($event, index, valueProps.firstLevel)"
+            @clear="handleClear(index)"
+            filterable
+            clearable
+          >
+            <el-option
+              v-for="op in data"
+              :key="op[dictProps.value]"
+              :label="op[dictProps.label]"
+              :value="op"
+              :disabled="noRepeat && disabledFirst(op)"
+            ></el-option>
+          </el-select>
+        </div>
+        <div
+          class="select-container"
+          :class="{ 'disabled-container': isDisabled(1) }"
           v-if="level == '2' || level == '3'"
-          v-model="item[valueProps.secondLevel]"
-          :value-key="childProps.value"
-          :placeholder="placeholder"
-          :disabled="allDisabled || disabledSelect[1] || disabled"
-          @change="handleChange($event, index, valueProps.secondLevel)"
-          multiple
-          class="second-level"
-          :class="{ 'hide-border': level == 3 }"
-          filterable
-          clearable
+          :style="{ backgroundColor: minorColor }"
         >
-          <el-option
-            v-for="op in item[valueProps.firstLevel][dictProps.children]"
-            :key="op[childProps.value]"
-            :label="op[childProps.label]"
-            :value="op"
-          ></el-option>
-        </el-select>
-        <!-- 三级选择器 单选 -->
-        <el-select
-          v-if="level == '3'"
-          v-model="item[valueProps.thirdLevel]"
-          :placeholder="placeholder"
-          :value-key="childProps.value"
-          :disabled="allDisabled || disabledSelect[2] || disabled"
-          class="third-level"
-          @change="handleChange($event, index, valueProps.thirdLevel)"
-          filterable
-          clearable
-        >
-          <el-option
-            v-for="op in item[valueProps.secondLevel]"
-            :key="op[childProps.value]"
-            :label="op[childProps.label]"
-            :value="op"
-          ></el-option>
-        </el-select>
+          <!-- 二级选择器 多选 -->
+          <el-select
+            v-model="item[valueProps.secondLevel]"
+            v-if="item[valueProps.secondLevel]"
+            v-show="!isDisabled(1) || item[valueProps.secondLevel].length !== 0"
+            :value-key="childProps.value"
+            :placeholder="placeholder"
+            :disabled="isDisabled(1)"
+            @change="handleChange($event, index, valueProps.secondLevel)"
+            :multiple="secondMultiple"
+            :class="{ disabled: isDisabled(1) }"
+            class="second-level"
+            filterable
+            clearable
+          >
+            <el-option
+              v-for="op in getSecondOptions(
+                item[valueProps.firstLevel][dictProps.value]
+              )"
+              :key="op[childProps.value]"
+              :label="op[childProps.label]"
+              :value="op"
+            ></el-option>
+          </el-select>
+          <span
+            class="custom-tag second"
+            v-show="
+              isDisabled(1) &&
+              (!item[valueProps.secondLevel] ||
+                item[valueProps.secondLevel].length === 0)
+            "
+          >
+            <span>{{ "无" }}</span>
+          </span>
+          <div
+            class="divider"
+            :style="{ borderColor: primaryColor }"
+            v-if="level == '3' && secondMultiple"
+          ></div>
+          <!-- 三级选择器 单选 -->
+          <el-select
+            v-if="level == '3' && secondMultiple"
+            v-show="!isDisabled(2)"
+            v-model="item[valueProps.thirdLevel]"
+            :placeholder="placeholder"
+            :value-key="childProps.value"
+            :disabled="isDisabled(2)"
+            class="third-level"
+            @change="handleChange($event, index, valueProps.thirdLevel)"
+            filterable
+            clearable
+          >
+            <el-option
+              v-for="op in item[valueProps.secondLevel]"
+              :key="op[childProps.value]"
+              :label="op[childProps.label]"
+              :value="op"
+            ></el-option>
+          </el-select>
+          <span
+            class="custom-tag"
+            v-if="level == '3' && secondMultiple && isDisabled(2)"
+          >
+            <span>{{
+              getThirdLabel(
+                item[valueProps.firstLevel][dictProps.value],
+                item[valueProps.thirdLevel][childProps.value]
+              )
+            }}</span>
+          </span>
+        </div>
+        <i class="curtain" v-show="!allDisabled"></i>
         <i
-          class="el-icon-error close"
+          class="dms-icon-cuowu2 close"
           v-show="!allDisabled"
           @click="remove(index)"
         ></i>
       </div>
-      <el-button
-        type="primary"
-        icon="el-icon-plus"
-        class="add-btn"
-        v-show="!allDisabled && allowAdd"
-        :class="{ 'second-btn': level == 2 || level == 3 }"
-        @click="appendItem"
-        >新增
-      </el-button>
+      <div class="no-data" v-show="selectedList.length === 0">
+        <el-image :src="require('./no-data.png')" fit="contain"></el-image>
+      </div>
     </div>
   </div>
 </template>
@@ -147,15 +189,17 @@ export default class dictContainer extends Vue {
   @Prop({ default: 200 }) private width?: number;
   @Prop({ default: false }) private disabled?: boolean;
   @Prop({ default: () => [false, false, false] })
-  private disabledSelect?: Array<boolean>;
+  private disabledSelect!: Array<boolean>;
   @Prop({ default: false }) private noRepeat?: boolean;
   @Prop({ default: true }) private allowAdd?: boolean;
+  @Prop({ default: true }) private secondMultiple?: boolean;
+  @Prop({ default: 'blue' }) private color!: string;
 
   @Model('change', { type: Array }) value!: Array<Record<string, unknown>>;
 
   @Watch('value', { deep: true, immediate: true })
   onValueChange(newValue: Array<Record<string, unknown>>) {
-    this.selectedList = newValue;
+    this.selectedList = JSON.parse(JSON.stringify(newValue));
     this.$nextTick(() => {
       this.resetWidth();
     });
@@ -166,6 +210,13 @@ export default class dictContainer extends Vue {
     this.$nextTick(() => {
       this.resetWidth();
     });
+  }
+
+  @Watch('disabled')
+  onDisabledChange(newValue: boolean) {
+    if (newValue) {
+      this.allDisabled = true;
+    }
   }
 
   get dictProps() {
@@ -199,6 +250,22 @@ export default class dictContainer extends Vue {
     return this.width || 300;
   }
 
+  get primaryColor(): string {
+    const defaults: Record<string, string> = {
+      blue: '#5175F4',
+      green: '#21BB7E',
+      orange: '#F79408',
+    };
+    return defaults[this.color] ? defaults[this.color] : this.color;
+  }
+
+  get minorColor() {
+    const r = parseInt(this.primaryColor.substring(1, 3), 16);
+    const g = parseInt(this.primaryColor.substring(3, 5), 16);
+    const b = parseInt(this.primaryColor.substring(5, 7), 16);
+    return `rgba(${r},${g}, ${b}, 0.2)`;
+  }
+
   selectedList: Array<Record<string, unknown>> = [];
   allDisabled = true;
   visible = true;
@@ -206,21 +273,17 @@ export default class dictContainer extends Vue {
     (Math.random() + Math.floor(Math.random() * 9 + 1)) * Math.pow(10, 9)
   )}`;
 
-  created() {
-    this.appendItem();
-  }
-
   appendItem() {
     let item;
     if (this.level == 2) {
       item = {
         [this.valueProps.firstLevel]: '',
-        [this.valueProps.secondLevel]: [],
+        [this.valueProps.secondLevel]: this.secondMultiple ? [] : '',
       };
-    } else if (this.level == 3) {
+    } else if (this.level == 3 && this.secondMultiple) {
       item = {
         [this.valueProps.firstLevel]: '',
-        [this.valueProps.secondLevel]: [],
+        [this.valueProps.secondLevel]: this.secondMultiple ? [] : '',
         [this.valueProps.thirdLevel]: '',
       };
     } else {
@@ -231,22 +294,19 @@ export default class dictContainer extends Vue {
   }
 
   save() {
-    // 删除first为空的选择器
     const filter = this.selectedList.filter((item: any) => {
       const first = item[this.valueProps.firstLevel];
       return first !== '';
     });
 
     this.selectedList = filter;
-    if (this.selectedList.length === 0) {
-      this.appendItem();
-    }
 
     this.$emit('change', this.selectedList);
     this.allDisabled = true;
   }
 
   handleChange(value: any, index: number, propName: string) {
+    if (!this.secondMultiple) return;
     if (propName === this.valueProps.secondLevel) {
       this.$nextTick(() => {
         this.setWidth(index);
@@ -268,6 +328,10 @@ export default class dictContainer extends Vue {
     }
   }
 
+  handleOperation() {
+    this.allDisabled = false;
+  }
+
   disabledFirst(option: Record<string, unknown>) {
     const id = this.dictProps.value;
     const first = this.getLevelData(this.valueProps.firstLevel);
@@ -275,11 +339,15 @@ export default class dictContainer extends Vue {
   }
 
   remove(index: number) {
-    if (this.selectedList.length === 1) {
-      this.$message.warning('最后一项不允许删除！');
-      return;
-    }
+    // if (this.selectedList.length === 1) {
+    //   this.$message.warning('最后一项不允许删除！')
+    //   return
+    // }
     this.selectedList.splice(index, 1);
+  }
+
+  removeAll() {
+    this.selectedList = [];
   }
 
   setWidth(index: number) {
@@ -295,7 +363,9 @@ export default class dictContainer extends Vue {
     const tagListSelector = `#${this.id} .content #select${index} .second-level .el-select__tags .el-tag:not(.v-leave)`;
     const tagsList = document.querySelectorAll(tagListSelector);
 
-    const select = document.querySelector(`#select${index}`) as HTMLElement;
+    const select = document.querySelector(
+      `#${this.id} #select${index}`
+    ) as HTMLElement;
     const defaultWidth = this.defaultSelectWidth;
 
     const iconSelector = `#${this.id} .content #select${index} .second-level .el-input .el-input__suffix`;
@@ -311,12 +381,12 @@ export default class dictContainer extends Vue {
     }
 
     /* 计算tags总宽度 */
-    let tagsWidth = iconWidth + 30;
+    let tagsWidth = iconWidth + 60;
     for (let i = 0; i < tagsList.length; i++) {
       const tagStyle = getComputedStyle(tagsList[i]);
       const width = Number.parseInt(tagStyle.width) || 0;
       const borderWidth = Number.parseInt(tagStyle.borderWidth) || 0;
-      const margin = Number.parseInt(tagStyle.marginLeft) || 0;
+      const margin = Number.parseInt(tagStyle.marginRight) || 0;
       const tagWidth = width + 2 * borderWidth + margin;
       tagsWidth += tagWidth;
 
@@ -329,6 +399,9 @@ export default class dictContainer extends Vue {
 
     if (select) {
       select.style.width = `${selectWidth}px`;
+      const selector = `#${this.id} .content #select${index} .second-level .el-select__tags`;
+      const tagContainer = document.querySelector(selector) as HTMLElement;
+      tagContainer.style.maxWidth = `${selectWidth}px`;
     }
   }
 
@@ -351,6 +424,27 @@ export default class dictContainer extends Vue {
       }
     );
   }
+
+  getSecondOptions(key: string) {
+    const first = this.data.find((option: any) => {
+      const optionKey = option[this.dictProps.value];
+      return optionKey === key;
+    });
+    return first ? first[this.dictProps.children] : [];
+  }
+
+  isDisabled(level: number) {
+    return this.allDisabled || !!this.disabledSelect[level] || this.disabled;
+  }
+
+  getThirdLabel(firstKey: string, thirdKey: string) {
+    if (!thirdKey) return '无';
+    const options = this.getSecondOptions(firstKey) as any;
+    const option = options.find(
+      (op: Record<string, unknown>) => op[this.childProps.value] === thirdKey
+    );
+    return option[this.childProps.label] || '无';
+  }
 }
 </script>
 
@@ -361,45 +455,39 @@ export default class dictContainer extends Vue {
   border-radius: 4px;
 
   .header {
-    height: 32px;
+    height: 40px;
     display: flex;
-    background-color: #f6f7fb;
+    border-radius: 0 0 2px 2px;
+    background-color: #fafafa;
     justify-content: space-around;
     align-items: center;
     padding: 0 10px 0 16px;
+    border-bottom: 1px solid #e9e9e9;
 
     p {
       font-size: 14px;
-      font-weight: 500;
+      font-weight: bold;
       color: #222222;
-      line-height: 32px;
+      line-height: 50px;
       flex-grow: 1;
+      margin-bottom: 0;
     }
 
-    .func-btn {
-      font-size: 12px;
-      height: 20px;
-      width: 58px;
-      padding: 0 10px;
-      border-color: transparent !important;
-
-      &.edit {
-        background-color: rgba(#0492ff, 12%) !important;
-        color: #ffffff;
-      }
-
-      &.save {
-        background-color: #0492ff !important;
-        color: #ffffff;
+    .show-operation {
+      i {
+        font-size: 13px;
+        color: #555555;
+        line-height: 40px;
+        cursor: pointer;
       }
     }
 
     .dropdown {
-      line-height: 32px;
-      margin: 0 10px;
+      line-height: 40px;
+      margin: 0 15px;
 
       i {
-        color: #999999;
+        color: #555555;
         font-weight: bold;
         cursor: pointer;
         transition: all 0.3s;
@@ -417,6 +505,10 @@ export default class dictContainer extends Vue {
     display: flex;
     flex-wrap: wrap;
 
+    .no-data {
+      margin-bottom: 10px;
+    }
+
     .select {
       width: 200px;
       position: relative;
@@ -428,7 +520,9 @@ export default class dictContainer extends Vue {
           & > input {
             font-size: 12px;
             line-height: 18px;
-            min-height: 32px !important;
+            min-height: 28px !important;
+            color: #555555;
+            border-color: #adadad;
           }
 
           &.is-disabled {
@@ -444,42 +538,65 @@ export default class dictContainer extends Vue {
 
         .el-select__tags {
           .el-tag {
-            color: #222222;
-            background-color: #f2f7fd;
+            color: #555555;
+            background-color: #e9edfa;
+            padding: 1px 5px;
+            height: 22px;
 
             & .el-tag__close.el-icon-close {
               margin-right: 3px;
-              background-color: #cccccc;
+              background-color: #adadad;
               color: #ffffff;
             }
           }
         }
       }
 
-      .hide-border:not(:hover) {
-        ::v-deep .el-input:not(.is-focus) input {
-          border-bottom-color: transparent;
+      .first-level {
+        height: 40px;
+        font-size: 14px;
+        background: #5175f4;
+        padding: 6px 12px;
+        border-radius: 2px;
+        ::v-deep .el-input {
+          &.is-disabled {
+            & > input {
+              background-color: transparent;
+              font-weight: 500;
+              padding-left: 2px;
+              border: none;
+              color: #ffffff;
+              font-size: 14px;
+            }
+          }
         }
       }
 
-      .first-level {
-        ::v-deep .el-input {
-          &::before {
-            content: "";
-            position: absolute;
-            width: 4px;
-            height: 20px;
-            border-radius: 2px;
-            background-color: #0492ff;
-            top: 6px;
-            left: 4px;
+      .select-container {
+        opacity: 0.8;
+        padding: 8px 12px;
+        &.disabled-container {
+          padding: 4px 12px;
+        }
+        .divider {
+          border-top: 1px dotted #0492ff;
+          margin: 6px 0;
+        }
+        .custom-tag {
+          background-color: #ffffff;
+          height: 28px;
+          padding: 4px 10px;
+          border-radius: 14px;
+          display: inline-block;
+          margin: 2px 0;
+          line-height: 1.15;
+          &.second {
+            margin: 6px 0;
           }
-
-          &.is-disabled {
-            & > input {
-              background-color: #f2f7fd;
-              font-weight: 500;
-            }
+          span {
+            font-size: 12px;
+            color: #555555;
+            line-height: 20px;
           }
         }
       }
@@ -487,7 +604,26 @@ export default class dictContainer extends Vue {
       .second-level {
         ::v-deep .el-input {
           &.is-disabled > input {
+            border: none;
+            background-color: transparent;
+            padding-left: 14px !important;
+          }
+        }
+        &.disabled ::v-deep .el-select__tags {
+          .el-tag {
             background-color: #ffffff;
+            height: 28px;
+            padding: 4px 10px;
+            border-radius: 14px;
+            margin-left: 0;
+            margin-right: 6px;
+            margin-top: 4px;
+            &:first-child {
+              margin-left: 0;
+            }
+          }
+          input {
+            display: none;
           }
         }
       }
@@ -495,7 +631,7 @@ export default class dictContainer extends Vue {
       .third-level {
         ::v-deep .el-input {
           &.is-disabled > input {
-            background-color: #f2f7fd;
+            background-color: #f2f7fd !important;
             font-weight: 400;
           }
         }
@@ -506,16 +642,22 @@ export default class dictContainer extends Vue {
       position: absolute;
       left: calc(100% - 8px);
       bottom: calc(100% - 8px);
-      background-color: #ffffff;
+      font-size: 13px;
 
       &::before {
-        color: #cccccc;
+        color: #ff5757;
         cursor: pointer;
       }
+    }
 
-      &:hover::before {
-        color: #ff5757;
-      }
+    .curtain {
+      position: absolute;
+      left: calc(100% - 5px);
+      bottom: calc(100% - 5px);
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: #ffffff;
     }
 
     .add-btn {
