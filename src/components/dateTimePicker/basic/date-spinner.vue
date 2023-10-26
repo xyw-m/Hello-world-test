@@ -84,13 +84,13 @@ export default {
       handler(val) {
         const before = Math.abs(val - this.yearsLabel[0]);
         const after = Math.abs(
-          val - this.yearsLabel[this.yearsLabel.length - 1],
+          val - this.yearsLabel[this.yearsLabel.length - 1]
         );
         if (before < 5 || after < 5) {
           this.yearsLabel = getRangeYears(
             this.yearsLabel,
             this.date,
-            this.selectableRange,
+            this.selectableRange
           ).yearsLabel;
           this.$nextTick(() => {
             this.adjustSpinner('years', this.yearsLabel.indexOf(this.years));
@@ -179,9 +179,9 @@ export default {
             (this.scrollBarHeight(type) * 0.5 - 10) /
               this.typeItemHeight(type) +
             3) /
-            this.typeItemHeight(type),
+            this.typeItemHeight(type)
         ),
-        max,
+        max
       );
       if (type === 'days') {
         value++;
@@ -205,20 +205,20 @@ export default {
               this.date,
               this.yearsLabel[value],
               this.months,
-              this.days,
-            ),
+              this.days
+            )
           );
           break;
         case 'months':
           this.$emit(
             'change',
-            modifyDate(this.date, this.years, value, this.days),
+            modifyDate(this.date, this.years, value, this.days)
           );
           break;
         case 'days':
           this.$emit(
             'change',
-            modifyDate(this.date, this.years, this.months, value),
+            modifyDate(this.date, this.years, this.months, value)
           );
       }
     },
@@ -244,7 +244,7 @@ export default {
     this.yearsLabel = getRangeYears(
       [],
       this.date,
-      this.selectableRange,
+      this.selectableRange
     ).yearsLabel;
   },
 };

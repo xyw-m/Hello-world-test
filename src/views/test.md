@@ -1,14 +1,12 @@
-
-
 [![npm](https://img.shields.io/npm/v/vue-markdown-loader.svg?style=flat-square)](https://www.npmjs.com/package/vue-markdown-loader)
 ![vue](https://img.shields.io/badge/vue-2.x-4fc08d.svg?colorA=2c3e50&style=flat-square)
 
 > Convert Markdown file to Vue Component using markdown-it.
 
-
 ## Example
-- https://github.com/mint-ui/docs
-- https://github.com/elemefe/element
+
+- <https://github.com/mint-ui/docs>
+- <https://github.com/elemefe/element>
 
 ## Demo
 
@@ -25,12 +23,13 @@ npm i vue-markdown-loader -D
 ```
 
 ## Feature
+
 - Hot reload
 - Write vue script
 - Code highlight
 
-
 ## Usage
+
 [Documentation: Using loaders](https://webpack.js.org/concepts/loaders/)
 
 `webpack.config.js` file:
@@ -41,16 +40,17 @@ module.exports = {
     rules: [
       {
         test: /\.md$/,
-        loader: 'vue-markdown-loader'
-      }
-    ]
-  }
+        loader: "vue-markdown-loader",
+      },
+    ],
+  },
 };
 ```
 
 ## Options
 
 reference [markdown-it](https://github.com/markdown-it/markdown-it#init-with-presets-and-options)
+
 ```javascript
 {
   module: {
@@ -80,6 +80,7 @@ reference [markdown-it](https://github.com/markdown-it/markdown-it#init-with-pre
 ```
 
 Or you can customize markdown-it
+
 ```javascript
 var markdown = require('markdown-it')({
   html: true,
@@ -105,4 +106,5 @@ module.exports = {
 ```
 
 ## License
+
 WTFPL

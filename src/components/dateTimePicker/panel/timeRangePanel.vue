@@ -69,7 +69,7 @@ const maxTimeOfDay = function (date) {
     MAX_TIME,
     date.getFullYear(),
     date.getMonth(),
-    date.getDate(),
+    date.getDate()
   );
 };
 
@@ -78,13 +78,13 @@ const minTimeOfDay = function (date) {
     MIN_TIME,
     date.getFullYear(),
     date.getMonth(),
-    date.getDate(),
+    date.getDate()
   );
 };
 
 const advanceTime = function (date, amount) {
   return new Date(
-    Math.min(date.getTime() + amount, maxTimeOfDay(date).getTime()),
+    Math.min(date.getTime() + amount, maxTimeOfDay(date).getTime())
   );
 };
 
@@ -122,13 +122,13 @@ export default {
             this.minDate,
             value[0].getHours(),
             value[0].getMinutes(),
-            value[0].getSeconds(),
+            value[0].getSeconds()
           );
           this.maxDate = modifyTime(
             this.maxDate,
             value[1].getHours(),
             value[1].getMinutes(),
-            value[1].getSeconds(),
+            value[1].getSeconds()
           );
         } else {
           this.minDate = new Date();
@@ -210,12 +210,12 @@ export default {
       this.minDate = limitTimeRange(
         this.minDate,
         minSelectableRange,
-        this.format,
+        this.format
       );
       this.maxDate = limitTimeRange(
         this.maxDate,
         maxSelectableRange,
-        this.format,
+        this.format
       );
 
       this.$emit('pick', [this.minDate, this.maxDate], visible);
@@ -239,13 +239,13 @@ export default {
         this.minDate,
         date[0].getHours(),
         date[0].getMinutes(),
-        date[0].getSeconds(),
+        date[0].getSeconds()
       );
       const formattedMax = modifyTime(
         this.maxDate,
         date[1].getHours(),
         date[1].getMinutes(),
-        date[1].getSeconds(),
+        date[1].getSeconds()
       );
       return (
         Array.isArray(date) && formattedMin.getTime() <= formattedMax.getTime()

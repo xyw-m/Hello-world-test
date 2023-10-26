@@ -57,7 +57,7 @@ export default class list extends Vue {
   get dataSource() {
     if (this.data.includes(null) || this.data.includes(undefined)) {
       console.log(
-        'Null or Undefined Value found in the data, Please check data prop',
+        'Null or Undefined Value found in the data, Please check data prop'
       );
     }
     return this.data;

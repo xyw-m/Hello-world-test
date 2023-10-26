@@ -160,7 +160,7 @@ export default {
         date.getDate(),
         23,
         step,
-        0,
+        0
       ),
     ];
   },

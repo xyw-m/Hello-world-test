@@ -48,7 +48,7 @@ export function getRangeYears(oldRanges, date, ranges) {
 
   const dateRanges = Array.from(
     { length: 20 },
-    (item, index) => currYear + index - 10 + 1,
+    (item, index) => currYear + index - 10 + 1
   );
 
   // 判断谁在前面
@@ -95,14 +95,14 @@ export function getRangeMonths(date, ranges) {
         ? selectableRange[0]
         : new Date(
           selectableRange[0].getFullYear(),
-          selectableRange[0].getMonth(),
+          selectableRange[0].getMonth()
         ).getTime();
     const maxValue =
       Math.abs(selectableRange[1]) === Infinity
         ? selectableRange[1]
         : new Date(
           selectableRange[1].getFullYear(),
-          selectableRange[1].getMonth(),
+          selectableRange[1].getMonth()
         ).getTime();
     for (let i = 0; i < 12; i++) {
       months[i] =
@@ -134,7 +134,7 @@ export function getRangeDays(date, ranges) {
           : new Date(
             selectableRange[0].getFullYear(),
             selectableRange[0].getMonth(),
-            selectableRange[0].getDate(),
+            selectableRange[0].getDate()
           ).getTime();
       const maxValue =
         Math.abs(selectableRange[1]) === Infinity
@@ -142,7 +142,7 @@ export function getRangeDays(date, ranges) {
           : new Date(
             selectableRange[1].getFullYear(),
             selectableRange[1].getMonth(),
-            selectableRange[1].getDate(),
+            selectableRange[1].getDate()
           ).getTime();
       days[i] =
         new Date(currentYear, currentMonth, i + 1).getTime() < minValue ||
@@ -223,7 +223,7 @@ export function modifyTime(date, h, m, s) {
     h,
     m,
     s,
-    date.getMilliseconds(),
+    date.getMilliseconds()
   );
 }
 
@@ -235,7 +235,7 @@ export const modifyDate = function (date, y, m, d) {
     date.getHours(),
     date.getMinutes(),
     date.getSeconds(),
-    date.getMilliseconds(),
+    date.getMilliseconds()
   );
 };
 
@@ -247,7 +247,7 @@ export function clearMilliseconds(date) {
     date.getHours(),
     date.getMinutes(),
     date.getSeconds(),
-    0,
+    0
   );
 }
 

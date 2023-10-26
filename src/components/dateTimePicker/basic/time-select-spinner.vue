@@ -117,7 +117,7 @@ export default {
         this.formattedranges,
         this.interval.start,
         this.interval.end,
-        this.interval.step,
+        this.interval.step
       ).timesList;
     },
     timesLabelList() {
@@ -125,7 +125,7 @@ export default {
         this.formattedranges,
         this.interval.start,
         this.interval.end,
-        this.interval.step,
+        this.interval.step
       ).timesLabelList;
     },
     currentTime() {
@@ -182,9 +182,9 @@ export default {
           (this.$refs.time.wrap.scrollTop -
             (this.scrollBarHeight() * 0.5 - 10) / this.typeItemHeight() +
             3) /
-            this.typeItemHeight(),
+            this.typeItemHeight()
         ),
-        max,
+        max
       );
       this.modifyDateField(value);
     },

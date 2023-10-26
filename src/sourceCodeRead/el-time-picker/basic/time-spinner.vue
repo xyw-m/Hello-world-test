@@ -9,14 +9,17 @@
         class="el-time-spinner__wrapper"
         wrap-style="max-height: inherit;"
         view-class="el-time-spinner__list"
-        noresize>
+        noresize
+      >
         <li
-          v-for="(disabled,hour) in hoursList"
+          v-for="(disabled, hour) in hoursList"
           :key="hour"
-          :class="{ 'active': hour === hours, 'disabled': disabled }"
+          :class="{ active: hour === hours, disabled: disabled }"
           class="el-time-spinner__item"
-          @click="handleClick('hours', { value: hour, disabled: disabled })">
-          {{ ('0' + (amPmMode ? (hour % 12 || 12) : hour )).slice(-2) }}{{ amPm(hour) }}
+          @click="handleClick('hours', { value: hour, disabled: disabled })"
+        >
+          {{ ("0" + (amPmMode ? hour % 12 || 12 : hour)).slice(-2)
+          }}{{ amPm(hour) }}
         </li>
       </el-scrollbar>
       <!-- minutes 列-->
@@ -26,14 +29,16 @@
         class="el-time-spinner__wrapper"
         wrap-style="max-height: inherit;"
         view-class="el-time-spinner__list"
-        noresize>
+        noresize
+      >
         <li
           v-for="(enabled, key) in minutesList"
           :key="key"
-          :class="{ 'active': key === minutes, disabled: !enabled }"
+          :class="{ active: key === minutes, disabled: !enabled }"
           class="el-time-spinner__item"
-          @click="handleClick('minutes', { value: key, disabled: false })">
-          {{ ('0' + key).slice(-2) }}
+          @click="handleClick('minutes', { value: key, disabled: false })"
+        >
+          {{ ("0" + key).slice(-2) }}
         </li>
       </el-scrollbar>
       <!-- seconds 列-->
@@ -44,14 +49,16 @@
         class="el-time-spinner__wrapper"
         wrap-style="max-height: inherit;"
         view-class="el-time-spinner__list"
-        noresize>
+        noresize
+      >
         <li
           v-for="(second, key) in 60"
           :key="key"
-          :class="{ 'active': key === seconds }"
+          :class="{ active: key === seconds }"
           class="el-time-spinner__item"
-          @click="handleClick('seconds', { value: key, disabled: false })">
-          {{ ('0' + key).slice(-2) }}
+          @click="handleClick('seconds', { value: key, disabled: false })"
+        >
+          {{ ("0" + key).slice(-2) }}
         </li>
       </el-scrollbar>
     </template>
@@ -59,54 +66,70 @@
 </template>
 <script>
 export default {
-  data(){
+  data() {
     return {
       selectableRange: [],
-      currentScrollbar: null
-    }
+      currentScrollbar: null,
+    };
   },
   props: {
-    showSeconds: {  // timePanel的计算属性
+    showSeconds: {
+      // timePanel的计算属性
       type: Boolean,
-      default: true
+      default: true,
     },
     arrowControl: Boolean, // time-picker的属性，暴露给用户
     date: {},
     defaultValue: {}, // reserved for future use
   },
   computed: {
-    hoursList(){
-      return getRangeHours(this.selectableRange)
+    hoursList() {
+      return getRangeHours(this.selectableRange);
     },
-    minutesList(){
-      return getRangeMinutes(this.selectableRange, this.hours)
-    }
+    minutesList() {
+      return getRangeMinutes(this.selectableRange, this.hours);
+    },
   },
   methods: {
-    handleClick(type, { value, disabled }){
-      if(!disabled){
-        this.modifyDateField(type, value)
-        this.emitSelectRange(type)
-        this.adjustSpinner(type, value)
+    handleClick(type, { value, disabled }) {
+      if (!disabled) {
+        this.modifyDateField(type, value);
+        this.emitSelectRange(type);
+        this.adjustSpinner(type, value);
       }
     },
-    modifyDateField(type, value){
-      switch(type){
-        case 'hours': this.$emit('change', modifyTime(this.date, value, this.minutes, this.seconds)); break;
-        case 'minutes': this.$emit('change', modifyTime(this.date, this.hours, value, this.seconds)); break;
-        case 'seconds': this.$emit('change', modifyTime(this.date, this.hours, this.minutes, value)); break;
+    modifyDateField(type, value) {
+      switch (type) {
+        case 'hours':
+          this.$emit(
+            'change',
+            modifyTime(this.date, value, this.minutes, this.seconds)
+          );
+          break;
+        case 'minutes':
+          this.$emit(
+            'change',
+            modifyTime(this.date, this.hours, value, this.seconds)
+          );
+          break;
+        case 'seconds':
+          this.$emit(
+            'change',
+            modifyTime(this.date, this.hours, this.minutes, value)
+          );
+          break;
       }
     },
-    emitSelectRange(type){
-      if(type === 'hours'){
-        this.$emit('select-range', 0, 2)
-      } else if(type === 'minutes'){
-        this.$emit('select-range', 3, 5)
-      } else if (type === 'seconds'){
-        this.$emit('select-range', 6, 8)
+    emitSelectRange(type) {
+      if (type === 'hours') {
+        this.$emit('select-range', 0, 2);
+      } else if (type === 'minutes') {
+        this.$emit('select-range', 3, 5);
+      } else if (type === 'seconds') {
+        this.$emit('select-range', 6, 8);
       }
-      this.currentScrollbar = type
-    }
-  }
-}
+      this.currentScrollbar = type;
+    },
+  },
+};
 </script>

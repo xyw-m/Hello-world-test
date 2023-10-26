@@ -135,9 +135,9 @@ export default {
             (this.scrollBarHeight(type) * 0.5 - 10) /
               this.typeItemHeight(type) +
             3) /
-            this.typeItemHeight(type),
+            this.typeItemHeight(type)
         ),
-        type === 'hours' ? 23 : 59,
+        type === 'hours' ? 23 : 59
       );
       this.modifyDateField(type, value);
     },
@@ -153,19 +153,19 @@ export default {
         case 'hours':
           this.$emit(
             'change',
-            modifyTime(this.date, value, this.minutes, this.seconds),
+            modifyTime(this.date, value, this.minutes, this.seconds)
           );
           break;
         case 'minutes':
           this.$emit(
             'change',
-            modifyTime(this.date, this.hours, value, this.seconds),
+            modifyTime(this.date, this.hours, value, this.seconds)
           );
           break;
         case 'seconds':
           this.$emit(
             'change',
-            modifyTime(this.date, this.hours, this.minutes, value),
+            modifyTime(this.date, this.hours, this.minutes, value)
           );
           break;
       }

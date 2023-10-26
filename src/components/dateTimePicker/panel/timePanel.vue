@@ -76,7 +76,7 @@ export default {
           this.date,
           date.getHours(),
           date.getMinutes(),
-          date.getSeconds(),
+          date.getSeconds()
         );
       } else if (!newVal) {
         date = this.defaultValue ? new Date(this.defaultValue) : new Date();
@@ -125,7 +125,7 @@ export default {
     handleConfirm(visible = false, first) {
       if (first) return;
       const date = clearMilliseconds(
-        limitTimeRange(this.date, this.selectableRange, this.format),
+        limitTimeRange(this.date, this.selectableRange, this.format)
       );
       this.$emit('pick', date, visible, first);
     },

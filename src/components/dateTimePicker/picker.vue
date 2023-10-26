@@ -168,7 +168,7 @@ const parseAsFormatAndType = (
   value,
   customFormat,
   type,
-  rangeSeparator = '-',
+  rangeSeparator = '-'
 ) => {
   if (!value) return null;
   const { parser } =
@@ -309,7 +309,7 @@ export default {
         this.parsedValue,
         this.format,
         this.type,
-        this.rangeSeparator,
+        this.rangeSeparator
       );
       if (Array.isArray(this.userInput)) {
         return [
@@ -382,7 +382,7 @@ export default {
           current.getDate(),
           hours,
           minutes,
-          seconds,
+          seconds
         );
       }
 
@@ -405,8 +405,8 @@ export default {
                   current.getDate(),
                   hours,
                   minutes,
-                  seconds,
-                ),
+                  seconds
+                )
               );
             }
           });
@@ -437,8 +437,8 @@ export default {
                   current.getDate(),
                   hours,
                   minutes,
-                  0,
-                ),
+                  0
+                )
               );
             }
           });
@@ -586,7 +586,7 @@ export default {
                 date.getDate(),
                 hours,
                 minutes,
-                seconds,
+                seconds
               );
             });
           }
@@ -664,7 +664,7 @@ export default {
                 result.push(
                   `${hours < 10 ? `0${hours}` : hours}:${
                     minutes < 10 ? `0${minutes}` : minutes
-                  }`,
+                  }`
                 );
               }
             });
@@ -709,7 +709,7 @@ export default {
           date,
           this.valueFormat,
           this.type,
-          this.rangeSeparator,
+          this.rangeSeparator
         );
       } else {
         return date;
@@ -745,7 +745,7 @@ export default {
             this.valueOnOpen,
             this.valueFormat,
             this.type,
-            this.rangeSeparator,
+            this.rangeSeparator
           ) || this.valueOnOpen;
         this.emitInput(oldValue);
       }
@@ -794,7 +794,7 @@ export default {
             this.picker.value[1],
             value.getHours(),
             value.getMinutes(),
-            value.getSeconds(),
+            value.getSeconds()
           );
         }
         this.picker.value = newValue;
@@ -824,7 +824,7 @@ export default {
             this.picker.value[0],
             value.getHours(),
             value.getMinutes(),
-            value.getSeconds(),
+            value.getSeconds()
           );
         }
         this.picker.value = newValue;

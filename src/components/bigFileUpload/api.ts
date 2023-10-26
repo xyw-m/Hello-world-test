@@ -1,42 +1,40 @@
-
-
 // 查看当前上传文件状态
-export function isExist(data:any) {
-  return new Promise((resolve:any) => {
+export function isExist(data: any) {
+  return new Promise((resolve: any) => {
     setTimeout(() => {
-      const isExist = Math.random() > 0.5
-      const fileUploadId = Math.ceil((Math.random() * 10000000))
-      if(isExist){
+      const _isExist = Math.random() > 0.5;
+      const fileUploadId = Math.ceil(Math.random() * 10000000);
+      if (_isExist) {
         resolve({
-          isExist: isExist,
-          fileUploadId: fileUploadId
-        })
+          isExist,
+          fileUploadId,
+        });
       } else {
         resolve({
-          isExist: isExist,
-          nextChunk: -1
-        })
+          _isExist,
+          nextChunk: -1,
+        });
       }
-    })
-  })
+    });
+  });
 }
 
 // 大文件上传
-export function bigFileUpload(data:any) {
-  return new Promise((resolve:any) => {
+export function bigFileUpload(data: any) {
+  return new Promise((resolve: any) => {
     setTimeout(() => {
-      resolve()
-    }, 1000)
-  })
+      resolve();
+    }, 1000);
+  });
 }
 
 // 删除文件
-export function removeBigFileByMd5(data:any) {
-  return new Promise((resolve:any) => {
+export function removeBigFileByMd5(data: any) {
+  return new Promise((resolve: any) => {
     setTimeout(() => {
-      resolve()
-    }, 100)
-  })
+      resolve();
+    }, 100);
+  });
 }
 
 // 上传文件下载

@@ -1,9 +1,7 @@
 <template>
   <div class="playground">
     <div class="tri">
-      <div class="tri_top">
-        tag
-      </div>
+      <div class="tri_top">tag</div>
     </div>
   </div>
 </template>
@@ -11,7 +9,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 
 @Component({
-  name: 'tag'
+  name: 'tag',
 })
 export default class tag extends Vue {}
 </script>
@@ -25,28 +23,28 @@ export default class tag extends Vue {}
     margin: 50px;
     position: relative;
     float: left;
-    border: 1px solid #FFCCCC;
+    border: 1px solid #ffcccc;
   }
   .tri_top {
     // 实心三角形
     &:before {
-      content: '';
+      content: "";
       width: 0px;
       height: 0px;
       border-left: 10px solid transparent;
       border-right: 10px solid transparent;
-      border-bottom: 10px solid #FFCCCC;
+      border-bottom: 10px solid #ffcccc;
       position: absolute;
       top: -10px;
       left: 50px;
     }
     &::after {
-      content: '';
+      content: "";
       width: 0px;
       height: 0px;
       border-left: 9px solid transparent;
       border-right: 9px solid transparent;
-      border-bottom: 9px solid #FFFFFF;
+      border-bottom: 9px solid #ffffff;
       position: absolute;
       top: -9px;
       left: 51px;

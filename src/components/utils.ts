@@ -9,7 +9,7 @@ export function getTargetRect(target: any) {
 export function getFixedTop(
   placeholderRect: any,
   targetRect: any,
-  offsetTop: any,
+  offsetTop: any
 ) {
   if (
     offsetTop !== undefined &&
@@ -24,7 +24,7 @@ export function getFixedTop(
 export function getFixedBottom(
   placeholderRect: any,
   targetRect: any,
-  offsetBottom: any,
+  offsetBottom: any
 ) {
   if (
     offsetBottom !== undefined &&
@@ -74,11 +74,11 @@ export function addObserveTarget(target: any, affix: any) {
 export function removeObserveTarget(affix: any) {
   const observerEntity = observerEntities.find((oriObserverEntity: any) => {
     const hasAffix = oriObserverEntity.affixList.some(
-      (item: any) => item === affix,
+      (item: any) => item === affix
     );
     if (hasAffix) {
       oriObserverEntity.affixList = oriObserverEntity.affixList.filter(
-        (item: any) => item != affix,
+        (item: any) => item != affix
       );
     }
     return hasAffix;
@@ -86,14 +86,14 @@ export function removeObserveTarget(affix: any) {
 
   if (observerEntity && observerEntity.affixList.length === 0) {
     observerEntities = observerEntities.filter(
-      (item: any) => item !== observerEntity,
+      (item: any) => item !== observerEntity
     );
 
     // remove listener
     TRIGGER_EVENTS.forEach((eventName) => {
       observerEntity.target.removeEventListener(
         eventName,
-        eventHandler(observerEntity),
+        eventHandler(observerEntity)
       );
     });
   }

@@ -34,7 +34,7 @@ export default class sinotrukList extends Vue {
   get dataSource() {
     if (this.data.includes(null) || this.data.includes(undefined)) {
       console.log(
-        'sinotruk-list: Null or Undefined Value found in the data, Please check the data prop.',
+        'sinotruk-list: Null or Undefined Value found in the data, Please check the data prop.'
       );
     }
     return this.data;
@@ -52,7 +52,7 @@ export default class sinotrukList extends Vue {
     } else {
       if (obj[property] == null || obj[property] == undefined) {
         console.log(
-          `sinotruk-list: Null or Undefined Value found in the Property[${property}], Please check the Property.`,
+          `sinotruk-list: Null or Undefined Value found in the Property[${property}], Please check the Property.`
         );
       }
       return true;

@@ -1,15 +1,15 @@
-import { initGlobalState, MicroAppStateActions } from 'qiankun'
+import { initGlobalState, MicroAppStateActions } from 'qiankun';
 
 // 在主应用中
 const initialState = {
-  component:{
+  component: {
     path: '',
-    com: null
-  }
-}
+    com: null,
+  },
+};
 
 // 初始化state
-const actions = initGlobalState(initialState)
+const actions = initGlobalState(initialState);
 
 // 监听actions全局公共状态数据的变化
 // actions.onGlobalStateChange((state, prevState) => {
@@ -19,4 +19,4 @@ const actions = initGlobalState(initialState)
 //   console.log(state)
 // })
 
-export default actions
+export default actions;

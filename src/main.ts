@@ -17,6 +17,10 @@ import actions from './action.js';
 // 消息提示的环境配置，设置为FALSE时不会显示开发模式中的一些警告信息
 Vue.config.productionTip = false;
 
+console.log(ElementUI, 'elementUI before use');
+debugger;
+console.log(ElementUI, 'elementUI after use');
+
 Vue.use(ElementUI);
 Vue.use(Antd);
 Vue.use(xywui);

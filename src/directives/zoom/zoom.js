@@ -49,7 +49,7 @@ zoomDirective.install = (Vue) => {
                       translate(${computedX}px, ${computedY}px);
                       transition: transform ease 0.05s; 
                       cursor: move;
-                      ${style}`,
+                      ${style}`
           );
           // console.log(`X:${offsetX}, Y:${offsetY}`)
         }
@@ -73,7 +73,7 @@ zoomDirective.install = (Vue) => {
         zoom.scaleExtent(binding.value);
       } else if (binding.value && !(binding.value instanceof Array)) {
         throw new Error(
-          `invalid type of directive param, need Array[min,max], got ${typeof binding.value}`,
+          `invalid type of directive param, need Array[min,max], got ${typeof binding.value}`
         );
       }
       // 为父元素设置超出边界内容隐藏
@@ -93,7 +93,7 @@ zoomDirective.install = (Vue) => {
         zoomDirective[el.id].zoom.scaleExtent(binding.value);
       } else if (binding.value && !(binding.value instanceof Array)) {
         throw new Error(
-          `invalid type of directive param, need Array[min,max], got ${typeof binding.value}`,
+          `invalid type of directive param, need Array[min,max], got ${typeof binding.value}`
         );
       }
     },

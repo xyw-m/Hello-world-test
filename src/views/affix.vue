@@ -142,6 +142,11 @@ export default class About extends Vue {
   handleScroll(event: any) {
     const { target } = event;
   }
+
+  mounted() {
+    const descriptor = Object.getOwnPropertyDescriptors(affix);
+    console.log(descriptor);
+  }
 }
 </script>
 <style lang="scss" scoped>
